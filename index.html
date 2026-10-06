@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지 계산해 드려요.">
+<meta name="description" content="치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지, 그 돈으로 주식을 했다면 어땠을지 알려 드려요.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="치킨 영수증">
-<meta property="og:description" content="치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지 계산해 드려요.">
+<meta property="og:description" content="치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지, 그 돈으로 주식을 했다면 어땠을지 알려 드려요.">
 <meta property="og:url" content="https://sujin412.github.io/chicken-receipt/">
 <style>html{color-scheme:light}body{margin:0;-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>치킨 영수증</title>
@@ -32,6 +32,8 @@
   --chip-on: #191b21;
   --chip-on-fg: #ffffff;
   --on-ink: #ffffff;
+  --solid-red: #d8261f;
+  --solid-blue: #2a63d9;
   --shadow: 0 1px 0 rgba(20, 24, 36, 0.06), 0 10px 30px rgba(20, 24, 36, 0.10);
 
   --f-display: "Black Han Sans", "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
@@ -43,7 +45,7 @@
     --ground: #121419; --surface: #1c1f27; --line: #2e3340; --fg: #eef0f5; --muted: #9aa1b2;
     --ink: #ff5148; --ink-soft: rgba(255, 81, 72, 0.14); --cool: #6b9bff; --cool-soft: rgba(107, 155, 255, 0.14);
     --paper: #f3f1ec; --paper-ink: #1c1d20; --paper-muted: #6d6f75;
-    --chip-on: #eef0f5; --chip-on-fg: #121419; --on-ink: #ffffff;
+    --chip-on: #eef0f5; --chip-on-fg: #121419; --on-ink: #ffffff; --solid-red: #d63a32; --solid-blue: #2f5fcf;
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     color-scheme: dark;
   }
@@ -52,13 +54,13 @@
   --ground: #121419; --surface: #1c1f27; --line: #2e3340; --fg: #eef0f5; --muted: #9aa1b2;
   --ink: #ff5148; --ink-soft: rgba(255, 81, 72, 0.14); --cool: #6b9bff; --cool-soft: rgba(107, 155, 255, 0.14);
   --paper: #f3f1ec; --paper-ink: #1c1d20; --paper-muted: #6d6f75;
-  --chip-on: #eef0f5; --chip-on-fg: #121419; --on-ink: #ffffff;
+  --chip-on: #eef0f5; --chip-on-fg: #121419; --on-ink: #ffffff; --solid-red: #d63a32; --solid-blue: #2f5fcf;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
-body { background: var(--ground); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+body { background: var(--ground); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere; }
 .wrap { max-width: 460px; margin: 0 auto; padding: 28px 16px 48px; display: grid; gap: 20px; }
 
 header { display: grid; gap: 6px; }
@@ -96,7 +98,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .seg input:checked + label { background: var(--chip-on); color: var(--chip-on-fg); font-weight: 700; }
 .seg input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: -2px; }
 
-.print { font: inherit; font-family: var(--f-display); font-size: 20px; letter-spacing: 0.02em; padding: 14px; border-radius: 12px; border: 0; background: var(--ink); color: var(--on-ink); cursor: pointer; }
+.print { font: inherit; font-family: var(--f-display); font-size: 20px; letter-spacing: 0.02em; padding: 14px; border-radius: 12px; border: 0; background: var(--solid-red); color: var(--on-ink); cursor: pointer; }
 .print:active { transform: translateY(1px); }
 
 /* receipt */
@@ -161,7 +163,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .game h2 { font-family: var(--f-display); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 0; text-wrap: balance; }
 .game .intro { margin: 0; color: var(--muted); font-size: 14px; }
 .go { font: inherit; font-weight: 700; font-size: 16px; padding: 14px; border-radius: 12px; border: 0; background: var(--fg); color: var(--ground); cursor: pointer; }
-.go.red { background: var(--ink); color: var(--on-ink); }
+.go.red { background: var(--solid-red); color: var(--on-ink); }
 
 .progress { display: flex; gap: 6px; }
 .progress i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
@@ -201,13 +203,13 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 /* 영수증 → 주식 게임 버튼 */
 .next-cta {
   font: inherit; cursor: pointer; border: 0; border-radius: 14px; margin-top: 14px;
-  background: var(--ink); color: var(--on-ink); padding: 16px 18px; display: grid; gap: 4px; text-align: left;
+  background: var(--solid-red); color: var(--on-ink); padding: 16px 18px; display: grid; gap: 4px; text-align: left;
   box-shadow: 0 8px 24px var(--ink-soft);
 }
 .next-cta span { font-family: var(--f-display); font-size: clamp(20px, 6vw, 24px); line-height: 1.25; text-wrap: balance; }
 .next-cta small { font-size: 13px; opacity: 0.9; }
 .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(transparent, var(--ground) 35%); display: grid; justify-items: center; }
-.dock-btn { font: inherit; font-family: var(--f-display); font-size: 18px; cursor: pointer; border: 0; border-radius: 999px; padding: 14px 22px; width: min(428px, 100%); background: var(--ink); color: var(--on-ink); box-shadow: var(--shadow); }
+.dock-btn { font: inherit; font-family: var(--f-display); font-size: 18px; cursor: pointer; border: 0; border-radius: 999px; padding: 14px 22px; width: min(428px, 100%); background: var(--solid-red); color: var(--on-ink); box-shadow: var(--shadow); }
 @media (prefers-reduced-motion: no-preference) {
   .next-cta.appear { animation: ctaIn .45s cubic-bezier(.2, 1.3, .4, 1) both, nudge 1.6s ease-in-out 3; animation-delay: var(--cd), calc(var(--cd) + .6s); }
   .dock:not([hidden]) { animation: lineIn .25s ease-out both; }
@@ -217,7 +219,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 
 /* 증권 앱 계좌 화면 */
 .news { display: flex; align-items: center; gap: 8px; }
-.flash { background: var(--ink); color: var(--on-ink); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.06em; }
+.flash { background: var(--solid-red); color: var(--on-ink); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.06em; }
 .acct { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; font-variant-numeric: tabular-nums; background: var(--surface); overflow: hidden; }
 .acct-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
 .acct-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; }
@@ -230,11 +232,11 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .plv.up { color: var(--ink); }
 .plv.down { color: var(--cool); }
 .fill { position: absolute; inset: auto 8px 8px 8px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--on-ink); background: var(--fg); }
-.fill.sell { background: var(--cool); }
-.fill.buy { background: var(--ink); }
+.fill.sell { background: var(--solid-blue); }
+.fill.buy { background: var(--solid-red); }
 .fill.hold, .fill.wait { background: var(--fg); color: var(--ground); }
-.choice.sell { background: var(--cool); border-color: var(--cool); color: var(--on-ink); }
-.choice.buy { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
+.choice.sell { background: var(--solid-blue); border-color: var(--solid-blue); color: var(--on-ink); }
+.choice.buy { background: var(--solid-red); border-color: var(--solid-red); color: var(--on-ink); }
 .choice.sell small, .choice.buy small { color: inherit; opacity: 0.85; }
 .choice[disabled] { opacity: 0.55; cursor: default; }
 @media (prefers-reduced-motion: no-preference) {
@@ -297,6 +299,31 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .kbubble .kt { padding: 10px 12px 2px; font-weight: 700; font-size: 14px; }
 .kbubble .kd { padding: 0 12px 10px; font-size: 12px; color: #555555; }
 .kbubble .kb { border-top: 1px solid #e5e5e5; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; }
+
+/* 종목 고르기 · 주문서 · 보유 종목 */
+.picks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pick { font: inherit; cursor: pointer; text-align: left; border: 1px solid var(--line); border-radius: 12px; background: var(--ground); color: var(--fg); padding: 12px; display: grid; gap: 2px; min-width: 0; }
+.pick .pi { font-size: 22px; }
+.pick b { font-size: 15px; }
+.pick small { font-size: 12px; color: var(--muted); }
+.order { gap: 10px; }
+.oname { font-family: var(--f-display); font-weight: 400; font-size: 20px; }
+.muted { color: var(--muted); font-size: 12px; }
+.hold-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.hold-top b { font-size: 16px; }
+.spark { width: 100%; height: auto; display: block; }
+
+/* 종목 뽑기 */
+.slot-machine { border: 2px dashed var(--line); border-radius: 14px; padding: 18px 14px; display: grid; justify-items: center; gap: 4px; text-align: center; background: var(--ground); }
+.slot-machine .sm-icon { font-size: 40px; line-height: 1.1; }
+.slot-machine .sm-name { font-family: var(--f-display); font-weight: 400; font-size: 28px; line-height: 1.2; }
+.slot-machine .sm-desc { font-size: 13px; color: var(--muted); }
+.slot-machine.landed { border-style: solid; border-color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) { .slot-machine.landed { animation: popIn .4s cubic-bezier(.2, 1.4, .4, 1) both; } }
+@keyframes popIn { 0% { transform: scale(1.15); } 100% { transform: none; } }
+.up-t { color: var(--ink); }
+.down-t { color: var(--cool); }
+.luck { margin: 0; font-size: 14px; background: var(--ground); border-radius: 10px; padding: 12px; }
 </style>
 </head>
 <body>
@@ -310,7 +337,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   <header id="intro">
     <div class="eyebrow">소비 영수증 발급기</div>
     <h1>그 치킨,<br><em>다 모으면</em> 얼마?</h1>
-    <p class="lede">치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지 계산해 드려요.</p>
+    <p class="lede">치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지, 그 돈으로 주식을 했다면 어땠을지 알려 드려요.</p>
   </header>
 
   <section class="duel" id="duel" hidden></section>
@@ -372,15 +399,16 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 
   <section class="notes">
     <p>· 환산은 대략이에요. 치킨 박스 높이 10cm, 아메리카노 355mL, 배달 대기 30분, 담배 1개비 8.4cm, 편의점 1회 5분, 택시 1회 7km 로 계산했어요.</p>
-    <p>· 주식시장 평균은 미국 S&amp;P500 지수(배당 제외)를 원·달러 월말 환율로 원화 환산해 계산했어요. 매달 말 영수증 금액만큼 샀고, 판 뒤의 돈은 이자 없는 현금으로 뒀어요. 2015년 1월 ~ 2026년 9월, 출처 Yahoo Finance. 세금·수수료는 빼지 않았어요.</p>
-    <p>· 사건 카드는 그 달에 실제로 있었던 일이고, 잔고는 그 달 말 기준이에요.</p>
-    <p>· 과거 결과는 미래를 보장하지 않아요. 특정 상품이나 투자를 권하는 계산이 아니에요.</p>
+    <p>· 종목은 후보 중에서 무작위로 뽑혀요. 회사 이름은 재미로 살짝 바꿔 썼어요. 가격은 실제 월말 주가(배당·액면분할 반영)이고, 미국 종목은 그 달 원·달러 환율로 원화 환산했어요. 「미국 대표 500 묶음」은 S&amp;P500 지수(배당 제외)를 1/10 로 나눠 1주 가격처럼 보여 줘요. 2015년 1월 ~ 2026년 9월, 출처 Yahoo Finance.</p>
+    <p>· 매달 말 영수증 금액만큼 샀고, 판 뒤의 돈은 이자 없는 현금으로 뒀어요. 소수점 단위로 살 수 있다고 쳤고, 세금·수수료는 빼지 않았어요. 사건 카드는 그 달에 실제로 있었던 일이고, 잔고는 그 달 말 기준이에요.</p>
+    <p>· 과거 결과는 미래를 보장하지 않아요. 특정 종목이나 상품을 사라고 권하는 계산이 아니에요.</p>
     <p class="proto">프로토타입: 결과 이미지와 도전장 링크는 지금도 동작해요. 카톡 공유 창과 앱 설치 스토어 연결은 배포할 때 붙여요.</p>
   </section>
 </div>
 
 <script>
 const DATA = {"start":"2015-01","end":"2026-09","spx":[1994.99,2104.5,2067.89,2085.51,2107.39,2063.11,2103.84,1972.18,1920.03,2079.36,2080.41,2043.94,1940.24,1932.23,2059.74,2065.3,2096.95,2098.86,2173.6,2170.95,2168.27,2126.15,2198.81,2238.83,2278.87,2363.64,2362.72,2384.2,2411.8,2423.41,2470.3,2471.65,2519.36,2575.26,2647.58,2673.61,2823.81,2713.83,2640.87,2648.05,2705.27,2718.37,2816.29,2901.52,2913.98,2711.74,2760.17,2506.85,2704.1,2784.49,2834.4,2945.83,2752.06,2941.76,2980.38,2926.46,2976.74,3037.56,3140.98,3230.78,3225.52,2954.22,2584.59,2912.43,3044.31,3100.29,3271.12,3500.31,3363.0,3269.96,3621.63,3756.07,3714.24,3811.15,3972.89,4181.17,4204.11,4297.5,4395.26,4522.68,4307.54,4605.38,4567.0,4766.18,4515.55,4373.94,4530.41,4131.93,4132.15,3785.38,4130.29,3955.0,3585.62,3871.98,4080.11,3839.5,4076.6,3970.15,4109.31,4169.48,4179.83,4450.38,4588.96,4507.66,4288.05,4193.8,4567.8,4769.83,4845.65,5096.27,5254.35,5035.69,5277.51,5460.48,5522.3,5648.4,5762.48,5705.45,6032.38,5881.63,6040.53,5954.5,5611.85,5569.06,5911.69,6204.95,6339.39,6460.26,6688.46,6840.2,6849.09,6845.5,6939.03,6878.88,6528.52,7209.01,7580.06,7499.36,7489.72,7686.14,7651.54],"krw":[1101.0,1100.67,1105.5,1068.97,1107.0,1118.22,1170.77,1177.6,1194.16,1139.86,1154.83,1175.44,1205.63,1241.13,1140.23,1143.0,1198.45,1152.15,1123.35,1118.38,1101.62,1146.7,1167.86,1206.26,1169.21,1133.94,1117.02,1135.64,1123.9,1146.14,1124.05,1123.33,1145.94,1123.45,1080.66,1066.38,1072.54,1079.39,1059.9,1067.6,1075.03,1120.54,1116.67,1115.45,1109.16,1137.7,1117.02,1116.3,1109.0,1115.1,1135.9,1158.79,1188.38,1155.51,1180.65,1207.16,1201.91,1163.7,1181.57,1156.35,1187.12,1200.1,1222.7,1210.79,1230.27,1198.49,1189.56,1179.59,1167.86,1129.52,1104.33,1086.42,1117.43,1123.37,1132.32,1106.63,1112.85,1130.51,1150.63,1165.51,1187.43,1174.38,1190.74,1189.89,1207.71,1197.59,1210.44,1263.38,1236.17,1301.73,1302.87,1350.19,1430.17,1421.65,1325.37,1260.91,1231.5,1318.35,1296.5,1337.32,1319.79,1323.07,1272.39,1323.03,1351.93,1348.07,1288.36,1293.53,1326.62,1333.38,1345.29,1374.64,1375.62,1380.28,1383.5,1336.57,1309.3,1378.57,1399.86,1467.39,1441.66,1449.86,1469.41,1431.16,1381.98,1363.59,1392.52,1386.97,1399.33,1424.02,1466.13,1437.91,1449.7,1432.32,1516.13,1487.38,1505.96,1541.73,1420.6,1377.11,1350.5]};
+const STK = {"AAPL":[25.9029,28.5133,27.6188,27.7786,29.0381,27.957,27.0365,25.2468,24.696,26.7559,26.6006,23.6684,21.8876,21.8594,24.6401,21.1925,22.7135,21.7446,23.7029,24.2635,25.8529,25.965,25.4041,26.6224,27.8935,31.625,33.1648,33.1625,35.4112,33.3852,34.477,38.166,35.8667,39.3389,40.1366,39.5247,39.1043,41.7706,39.3458,38.7549,43.9916,43.5772,44.7967,53.7749,53.3284,51.7031,42.3346,37.3942,39.4567,41.2234,45.2232,47.7754,41.8411,47.3021,50.9157,50.0776,53.7313,59.6785,64.3069,70.6593,74.4757,65.9332,61.3336,70.8632,76.8933,88.2263,102.795,125.058,112.236,105.5,115.575,128.817,128.108,117.896,118.762,127.813,121.359,133.387,142.055,148.091,138.015,146.111,161.464,173.449,170.724,161.494,170.775,154.188,145.785,133.914,159.175,154.207,135.552,150.401,145.434,127.651,141.76,145.046,162.256,166.959,174.649,191.124,193.567,185.363,168.925,168.491,187.662,190.211,182.179,178.801,169.631,168.493,190.435,208.631,219.983,227.1,231.067,224.036,235.62,248.616,234.3,240.362,220.772,211.201,199.884,204.183,206.572,231.286,253.693,269.375,278.093,271.122,258.776,263.709,253.338,270.867,311.791,289.111,308.644,316.85,333.02],"MSFT":[34.2201,37.4066,34.6854,41.4928,40.2341,37.9073,40.0968,37.6128,38.2524,45.4949,47.2894,48.2726,47.9333,44.5881,48.4001,43.703,46.7708,45.1558,50.0182,51.0226,51.1469,53.207,53.8704,55.551,57.7949,57.5427,59.2335,61.5719,63.1731,62.35,65.7601,67.9929,67.7382,75.6406,76.9252,78.1773,86.8322,86.1015,83.8059,85.872,91.1503,90.9381,97.827,103.989,105.878,98.8792,103.1,94.4345,97.0936,104.605,110.123,121.944,115.91,125.544,127.709,129.629,130.729,134.81,142.826,148.789,160.611,153.273,149.205,169.546,173.851,193.071,194.494,214.479,200.024,192.549,204.114,212.075,221.172,222.083,225.322,241.005,239.167,259.493,272.913,289.723,270.566,318.265,317.857,323.366,299.002,287.876,297.048,267.383,262.549,248.025,271.115,253.042,225.393,224.647,247.611,232.744,240.498,242.667,280.494,298.94,320.197,332.043,327.539,320.259,308.524,330.372,370.99,368.18,389.27,405.743,412.688,381.897,407.939,439.208,411.103,410.653,423.608,400.031,417.709,415.776,409.423,392.384,371.034,390.674,455.854,492.541,528.278,502.555,513.723,513.584,488.908,480.571,427.577,391.155,368.676,406.134,449.394,372.319,463.847,507.29,512.9],"NVDA":[0.4596,0.5301,0.503,0.5335,0.5343,0.4855,0.4816,0.545,0.5976,0.6878,0.7719,0.8021,0.7128,0.7659,0.8702,0.8678,1.1441,1.1512,1.3982,1.5048,1.681,1.7458,2.2653,2.6226,2.6825,2.4965,2.6797,2.5658,3.5548,3.56,4.0021,4.1764,4.4064,5.0975,4.9506,4.7727,6.0627,5.9727,5.7158,5.5507,6.2281,5.8505,6.047,6.9354,6.9438,5.2095,4.0423,3.302,3.5555,3.8194,4.4458,4.4815,3.3578,4.0709,4.1822,4.1563,4.3191,4.9878,5.3818,5.8427,5.8707,6.71,6.5493,7.2619,8.8207,9.4434,10.554,13.2979,13.4571,12.466,13.3288,12.988,12.9231,13.6441,13.2843,14.9376,16.1667,19.9113,19.4101,22.2868,20.6251,25.4549,32.5327,29.2856,24.3816,24.281,27.1743,18.4711,18.5956,15.1001,18.0925,15.0354,12.0955,13.4486,16.8666,14.5653,19.4719,23.1386,27.6891,27.6612,37.7143,42.1726,46.586,49.204,43.3695,40.6586,46.6307,49.3789,61.3492,78.8834,90.0991,86.1563,109.321,123.199,116.697,119.04,121.115,132.405,137.88,133.94,119.757,124.594,108.107,108.646,134.79,157.603,177.435,173.754,186.134,202.006,176.577,186.065,190.684,176.776,174.002,199.115,210.659,199.866,200.526,220.533,228.38],"TSLA":[13.5733,13.556,12.5847,15.07,16.72,17.884,17.7433,16.604,16.56,13.7953,15.3507,16.0007,12.7467,12.7953,15.318,16.0507,14.882,14.152,15.6527,14.134,13.602,13.182,12.6267,14.246,16.7953,16.666,18.5533,20.938,22.734,24.1073,21.5647,23.7267,22.74,22.102,20.59,20.7567,23.6207,22.8707,17.742,19.5933,18.982,22.8633,19.876,20.1107,17.6513,22.488,23.3653,22.1867,20.468,21.3253,18.6573,15.9127,12.344,14.8973,16.1073,15.0407,16.058,20.9947,21.996,27.8887,43.3713,44.5327,34.9333,52.1253,55.6667,71.9873,95.384,166.107,143.003,129.347,189.2,235.223,264.51,225.167,222.643,236.48,208.407,226.567,229.067,245.24,258.493,371.333,381.587,352.26,312.24,290.143,359.2,290.253,252.753,224.473,297.15,275.61,265.25,227.54,194.7,123.18,173.22,205.71,207.46,164.31,203.93,261.77,267.43,258.08,250.22,200.84,240.08,248.48,187.29,201.88,175.79,183.28,178.08,197.88,232.07,214.11,261.63,249.85,345.16,403.84,404.6,292.98,259.16,282.16,346.46,317.66,308.27,333.87,444.72,456.56,430.17,449.72,430.41,402.51,371.75,381.63,435.79,420.6,311.21,367.95,354.81],"INTC":[25.3493,25.6934,24.1633,25.1524,26.8209,23.6765,22.5324,22.3978,23.6534,26.5728,27.4792,27.2263,24.5156,23.5912,25.7917,24.1413,25.4033,26.3763,28.0329,29.08,30.587,28.2535,28.3286,29.6104,30.0594,29.7642,29.6573,29.7231,29.9111,27.9479,29.3809,29.2677,31.7797,37.9637,37.643,38.7511,40.4133,41.6595,44.0176,43.6288,46.9238,42.2569,40.8883,41.4192,40.4443,40.0936,42.4372,40.3889,40.5525,45.8674,46.5083,44.2045,38.3756,41.713,44.0483,41.5911,45.2054,49.5917,51.2054,52.7932,56.3921,49.2149,47.9739,53.1684,56.0985,53.335,42.5486,45.7275,46.4724,39.7412,43.7096,45.0385,50.1824,55.2802,58.2088,52.3243,52.2713,51.3745,49.1599,49.7926,49.0741,45.132,45.6313,47.7645,45.2789,44.5771,46.3154,40.7362,41.84,35.2372,34.2011,30.3696,24.5183,27.0491,28.9958,25.4859,27.2505,24.3324,31.8868,30.3154,30.812,32.772,35.0555,34.5619,34.9652,35.8996,44.1093,49.5859,42.5107,42.6056,43.714,30.1554,30.6555,30.7748,30.5462,22.04,23.46,21.52,24.05,20.05,19.43,23.73,22.71,20.1,19.55,22.4,19.8,24.35,33.55,39.99,40.56,36.9,46.47,45.61,44.13,94.48,114.68,139.63,90.2,89.51,120.23],"SEC":[20933.6,20810.9,22099.1,21623.7,20044.1,19461.2,18187.3,16713.9,17404.6,21057.4,19706.8,19648.9,17933.5,18370.1,20459.8,19414.9,20147.9,22237.8,24016.8,25280.9,24937.6,25577.4,27247.2,28557.6,31267.6,30459.3,32756.1,35475.2,35538.8,37908.0,38434.2,36935.2,41001.3,44039.6,40617.5,41112.2,40257.1,37965.9,39999.2,43071.1,41201.9,38192.6,37865.1,39666.3,38315.0,34974.3,34520.6,32219.7,38422.2,37548.1,37465.9,38472.8,35661.8,39745.6,38350.3,37208.7,41779.8,42929.7,42844.6,47835.0,48349.4,46463.4,41236.3,43179.4,43783.9,45902.3,50336.0,46945.5,50908.1,49508.6,58343.1,72634.6,73531.3,73979.7,73317.6,73407.7,72507.0,73008.9,71018.6,69390.2,67356.6,63448.0,64811.5,71495.9,66930.3,65652.0,63880.4,61861.2,61861.2,52635.7,56698.8,55129.0,49371.2,55228.8,57832.2,51738.2,57445.3,56696.9,60224.6,61636.1,67188.1,68279.9,66010.3,63267.7,65024.5,63598.5,69207.4,74979.5,69439.6,70108.2,79062.2,74360.7,70522.7,78547.4,80860.5,71608.3,59604.6,57375.4,52529.5,51911.9,51131.3,53180.5,56735.7,54478.0,55165.1,59058.9,70515.1,68836.2,83229.9,106641.0,99697.3,119521.0,159992.0,215815.0,167016.0,220257.0,316651.0,334000.0,262500.0,260000.0,268500.0],"KAKAO":[30152.4,26282.2,22787.1,21306.1,23162.3,24919.7,23873.1,26637.6,24860.4,22431.7,23813.9,22900.7,21615.2,18767.5,19617.8,19874.9,20329.8,18411.5,17976.4,16077.9,16176.8,15108.9,15366.0,15257.7,15396.4,16922.2,16466.5,17913.0,19577.5,20112.5,23778.3,24372.8,28534.0,28534.0,27047.8,27178.8,27774.0,25393.3,26186.9,22020.8,20532.9,22715.1,22318.4,24798.2,23607.9,18172.1,22318.4,20460.1,19725.1,20559.4,20559.4,23837.0,24730.9,26121.4,25227.5,26717.3,26915.9,28107.8,30888.8,30517.7,31611.1,34195.7,30915.3,36581.5,52387.0,53182.3,68292.0,80916.6,72467.1,65608.0,73162.9,77468.5,87711.5,97059.4,99048.3,112871.0,122319.0,162097.0,146186.0,154141.0,117346.0,124805.0,121324.0,111929.0,84568.7,93921.0,105960.0,89443.8,84568.7,69545.3,74420.4,73027.5,56810.3,50442.7,56113.8,52888.9,61653.9,62151.9,60857.1,57869.0,55976.6,48904.8,51096.0,47908.8,43775.3,37649.7,50299.2,54084.1,52291.3,53145.2,53544.0,48458.8,43174.2,40531.9,39086.1,37091.9,36045.0,36842.7,39983.5,38089.0,38238.6,43024.7,39045.3,38196.5,42640.2,59916.0,57918.8,62412.5,59516.6,65008.9,58617.9,60015.9,61314.1,62212.8,45800.0,47300.0,41950.0,34550.0,37400.0,36550.0,33550.0],"NKE":[39.137,41.3226,42.6884,42.0544,43.3766,46.0858,49.1576,47.6771,52.5971,56.0446,56.5792,53.595,53.1748,52.8146,52.8476,50.6725,47.4743,47.5958,47.8544,49.6996,45.5234,43.3877,43.2926,44.1083,45.9046,49.6013,48.5111,48.2325,46.126,51.5325,51.5762,46.2845,45.4431,48.1951,52.9541,55.003,59.9889,58.9425,58.6004,60.3203,63.3279,70.4744,68.0244,72.8824,75.1167,66.534,66.8026,65.9311,72.8141,76.2379,75.0788,78.3063,68.9668,75.0553,76.915,75.7422,84.1859,80.2688,84.0191,91.0469,86.5445,80.5484,74.5645,78.5657,89.0609,88.5821,88.1846,101.31,113.669,108.725,121.963,128.35,121.201,122.529,120.811,120.566,124.307,140.731,152.592,150.316,132.514,152.643,154.422,152.35,135.348,124.818,123.28,114.246,108.887,93.8645,105.547,97.7678,76.5599,85.3654,101.033,108.106,117.641,109.751,113.631,117.411,97.5274,102.599,102.617,94.5484,89.1854,95.8542,102.85,101.605,95.0165,97.2625,88.2651,86.6497,89.27,71.0634,70.5825,78.5591,83.7206,73.0472,74.6004,72.0303,73.2011,75.6094,60.7324,53.9589,57.9675,68.4169,71.9321,74.5132,67.5043,62.5283,62.567,62.0702,60.2191,60.5796,51.802,43.5051,45.339,40.6191,41.2722,38.65,35.4],"NC":[177446.0,156803.0,159438.0,179642.0,173054.0,174372.0,192819.0,191941.0,166027.0,166466.0,195455.0,189607.0,208746.0,213642.0,225659.0,203850.0,214087.0,210081.0,223434.0,240347.0,263047.0,235451.0,242128.0,223737.0,274812.0,247693.0,275716.0,325436.0,342160.0,343064.0,326340.0,347584.0,419903.0,385551.0,394591.0,411518.0,406460.0,344848.0,386229.0,331054.0,324617.0,341169.0,354503.0,356343.0,406920.0,394965.0,470832.0,434543.0,436406.0,429419.0,462022.0,489967.0,444323.0,444323.0,448515.0,500213.0,485309.0,480652.0,459227.0,508886.0,598246.0,610475.0,613297.0,604831.0,743105.0,838110.0,762858.0,776027.0,758155.0,729936.0,761918.0,884153.0,905046.0,888902.0,829072.0,788235.0,824323.0,778739.0,782537.0,626790.0,572658.0,595450.0,646733.0,616149.0,513617.0,425459.0,447978.0,403899.0,436000.0,334905.0,356945.0,362694.0,331551.0,373714.0,450852.0,436034.0,441874.0,422895.0,361578.0,366931.0,312426.0,287121.0,269115.0,244783.0,216557.0,226290.0,255002.0,237150.0,195341.0,191298.0,196031.0,173647.0,187649.0,177394.0,172858.0,184987.0,188340.0,214470.0,234192.0,180550.0,170295.0,167731.0,148653.0,145568.0,151738.0,205468.0,192732.0,201985.0,214920.0,219398.0,208950.0,200492.0,233328.0,229845.0,224000.0,270500.0,289500.0,257500.0,234500.0,224500.0,209000.0],"LGH":[625536.0,609170.0,764645.0,716457.0,734641.0,703728.0,779193.0,729186.0,776465.0,861022.0,916483.0,959790.0,905859.0,793427.0,863811.0,920485.0,965275.0,1021030.0,921398.0,869296.0,872952.0,749550.0,719386.0,790312.0,810600.0,809678.0,747892.0,798612.0,906508.0,916652.0,913885.0,885297.0,863165.0,1085410.0,1081720.0,1104890.0,1093740.0,1022190.0,1122550.0,1273090.0,1248000.0,1297250.0,1124400.0,1175510.0,1185740.0,970148.0,1077940.0,1032010.0,1185740.0,1167930.0,1328210.0,1332900.0,1197920.0,1230730.0,1178240.0,1105120.0,1225100.0,1181990.0,1185740.0,1192420.0,1189580.0,1154600.0,1059090.0,1310620.0,1295490.0,1272800.0,1296440.0,1392890.0,1369250.0,1418420.0,1431660.0,1542250.0,1482280.0,1440390.0,1494650.0,1465140.0,1484180.0,1677440.0,1388980.0,1390890.0,1272840.0,1114800.0,1003420.0,1055540.0,938154.0,906401.0,825575.0,874648.0,706262.0,654302.0,749561.0,685093.0,609078.0,490727.0,631209.0,698580.0,718899.0,646332.0,580537.0,602791.0,509905.0,444111.0,414117.0,449433.0,432017.0,305266.0,322682.0,346959.0,296626.0,311775.0,371393.0,410487.0,408044.0,337674.0,344027.0,346470.0,370416.0,323991.0,303467.0,298092.0,300046.0,312263.0,308706.0,333402.0,322042.0,315621.0,312163.0,292900.0,283484.0,281997.0,274067.0,256226.0,260190.0,264651.0,245820.0,252787.0,246318.0,228404.0,285629.0,313000.0,269000.0]};
 
 const FREQS = [
   { id: "m1", label: "월 1회",    perWeek: 12 / 52 },
@@ -490,20 +518,19 @@ const LAST = DATA.spx.length - 1;
 
 // 매달 말 영수증 금액을 넣는다. 주식을 들고 있으면 원화→달러로 S&P500 을 사고, 팔고 나면 현금(이자 없음)으로 쌓인다.
 // upto 달의 납입까지 반영한 잔고를 돌려준다. acts 는 upto 보다 앞선 달의 결정만 적용된다.
-function run(monthly, startYear, upto, acts) {
-  let units = 0, cash = 0, spent = 0, inMarket = true;
+function run(monthly, startYear, upto, acts, pk) {
+  let units = 0, cash = 0, spent = 0, cost = 0, inMarket = true;
   for (let i = (startYear - 2015) * 12; i <= upto; i++) {
-    if (inMarket) units += monthly / DATA.krw[i] / DATA.spx[i]; else cash += monthly;
+    if (inMarket) { units += monthly / pk[i]; cost += monthly; } else cash += monthly;
     spent += monthly;
     if (i === upto) break;
     const a = acts[i];
-    if (a === "sell" && inMarket) { cash += units * DATA.spx[i] * DATA.krw[i]; units = 0; inMarket = false; }
-    if (a === "buy" && !inMarket) { units += cash / DATA.krw[i] / DATA.spx[i]; cash = 0; inMarket = true; }
+    if (a === "sell" && inMarket) { cash += units * pk[i]; units = 0; cost = 0; inMarket = false; }
+    if (a === "buy" && !inMarket) { units += cash / pk[i]; cost = cash; cash = 0; inMarket = true; }
   }
-  const stock = units * DATA.spx[upto] * DATA.krw[upto];
-  return { spent, stock, cash, total: stock + cash, inMarket };
+  const stock = units * pk[upto];
+  return { spent, stock, cash, total: stock + cash, inMarket, units, avg: units ? cost / units : 0 };
 }
-
 function compute() {
   const months = (2026 - state.year) * 12 + 9;
   const rows = state.picked.map((id) => {
@@ -572,7 +599,7 @@ function renderReceipt(animate) {
   gameLine = "";
   lastRes = res; lastGame = null;
   $("shareOut").hidden = true;
-  game = { res, k: -1, acts: {}, log: [], done: false, names: pickChatNames() };
+  game = { res, phase: "idle", k: 0, acts: {}, log: [], names: pickChatNames() };
   if (animate) printed = true;
   renderVs(res);
   renderGame();
@@ -610,9 +637,11 @@ function readFriend() {
   } catch (_) { return null; }
 }
 const nick = () => $("nick").value.trim() || "친구";
+// 이미지·미리보기용: 닉네임이 없으면 「친구님의」 대신 「나의」
+const whose = () => ($("nick").value.trim() ? `${nick()}님의` : "나의");
 function duelToken() {
   const f = { n: nick(), t: receiptTitle, tot: Math.round(lastRes.total), y: lastRes.year, f: lastRes.rows[0].name };
-  if (lastGame) { f.g = lastGame.type; f.gm = Math.round(lastGame.total); }
+  if (lastGame) { f.g = lastGame.type; f.gm = Math.round(lastGame.total); f.s = lastGame.stock; }
   return "d" + b64urlEncode(f);
 }
 
@@ -623,7 +652,7 @@ function renderDuel() {
   el.innerHTML = `
     <div class="tag">CHALLENGE · 도전장 도착</div>
     <p class="big">${esc(friend.n)}님은 「${esc(friend.t)}」</p>
-    <p class="meta">${friend.y}년부터 ${won(friend.tot)} 썼고${friend.g ? `, 투자 성향은 「${esc(friend.g)}」` : ""}. 당신은 이길 수 있어요?</p>`;
+    <p class="meta">${friend.y}년부터 ${won(friend.tot)} 썼고${friend.g ? `, ${friend.s ? `${esc(friend.s)}${josa(friend.s, "을", "를")} 사서 ` : ""}투자 성향은 「${esc(friend.g)}」` : ""}. 당신은 이길 수 있어요?</p>`;
 }
 function renderVs(res) {
   const el = $("vs");
@@ -649,36 +678,135 @@ function countUp(node, target, delay, dur) {
   requestAnimationFrame(tick);
 }
 
+// ── 종목 ─────────────────────────────────────────────
+// 이름은 재미로 살짝 바꿔 쓴다(실제 회사를 떠올릴 수 있게). 가격은 실제 월말 수정주가(배당·분할 반영)이고,
+// 미국 종목은 그 달 원·달러 환율로 원화 환산한다. 묶음은 지수를 1/10 로 나눠 「1주」 가격처럼 보여 준다.
+const STOCKS = [
+  { id: "spx",   icon: "🧺", name: "미국 대표 500 묶음", desc: "미국 큰 회사 500곳을 조금씩 나눠 갖는 상품", usd: true, src: DATA.spx, scale: 0.1 },
+  { id: "aapl",  icon: "🍎", name: "애뿔",        desc: "아이폰 만드는 그 회사",        usd: true, src: STK.AAPL },
+  { id: "msft",  icon: "🪟", name: "마이크로소픗", desc: "윈도우·엑셀 만드는 그 회사",    usd: true, src: STK.MSFT },
+  { id: "nvda",  icon: "🎮", name: "엔비디야",    desc: "AI 반도체·그래픽카드 그 회사",  usd: true, src: STK.NVDA },
+  { id: "tsla",  icon: "🚗", name: "테슬러",      desc: "전기차 그 회사",              usd: true, src: STK.TSLA },
+  { id: "intc",  icon: "💻", name: "인탤",        desc: "컴퓨터 CPU 그 회사",          usd: true, src: STK.INTC },
+  { id: "sec",   icon: "📱", name: "삼송전자",    desc: "갤럭시 만드는 그 회사",        usd: false, src: STK.SEC },
+  { id: "kakao", icon: "💬", name: "카카우",      desc: "국민 메신저 그 회사",          usd: false, src: STK.KAKAO },
+  { id: "nke",   icon: "👟", name: "나이퀴",      desc: "운동화 그 회사",              usd: true, src: STK.NKE },
+  { id: "nc",    icon: "🗡️", name: "엔씨소푸트",  desc: "리니지 만드는 그 회사",        usd: false, src: STK.NC },
+  { id: "lgh",   icon: "💄", name: "엘쥐생활건강", desc: "화장품·생활용품 그 회사",      usd: false, src: STK.LGH },
+];
+const stockById = (id) => STOCKS.find((s) => s.id === id);
+const priceOf = (s) => s.src.map((v, i) => v * (s.scale || 1) * (s.usd ? DATA.krw[i] : 1));
+const pct1 = (v) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`;
+const shareStr = (n) => n.toFixed(n < 1 ? 3 : 2);
+
+// 지난 흐름만 그리는 작은 차트(다음 움직임은 보여 주지 않는다)
+function spark(pk, from, to) {
+  const W = 300, H = 64;
+  const pts = pk.slice(from, to + 1);
+  const lo = Math.min(...pts), hi = Math.max(...pts), span = hi - lo || 1;
+  const x = (k) => 4 + (k / Math.max(pts.length - 1, 1)) * (W - 8);
+  const y = (v) => H - 6 - ((v - lo) / span) * (H - 12);
+  const d = pts.map((v, k) => `${k ? "L" : "M"}${x(k).toFixed(1)},${y(v).toFixed(1)}`).join("");
+  const col = pts[pts.length - 1] >= pts[0] ? "var(--ink)" : "var(--cool)";
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/><circle cx="${x(pts.length - 1).toFixed(1)}" cy="${y(pts[pts.length - 1]).toFixed(1)}" r="3.5" fill="${col}"/></svg>`;
+}
+
 function renderGame() {
   const g = $("game");
-  if (!game) { g.hidden = true; g.innerHTML = ""; return; }
+  if (!game || game.phase === "idle") { g.hidden = true; g.innerHTML = ""; return; }
   g.hidden = false;
+  $("nextCta").hidden = true;
+  updateDock();
   const res = game.res;
   const rounds = ROUNDS[res.year];
   const food = res.rows[0].name;
+  const start = (res.year - 2015) * 12;
 
-  // 시작 전에는 게임 칸을 숨기고, 영수증 바로 아래 「이 돈으로 주식을 했다면?」 버튼이 시작을 맡는다.
-  if (game.k < 0) { g.hidden = true; g.innerHTML = ""; return; }
-  $("nextCta").hidden = true;
-  updateDock();
+  // 1) 종목 뽑기 — 사용자가 고르지 않고 무작위로 받는다(특정 종목을 권하는 구도가 되지 않게)
+  if (game.phase === "pick") {
+    const target = STOCKS[Math.floor(Math.random() * STOCKS.length)];
+    g.innerHTML = `
+      <h2>이 돈으로 주식을 했다면?</h2>
+      <p class="intro">매달 ${won(res.monthly)}씩 어떤 주식을 샀을지, 운에 맡겨 볼게요.</p>
+      <div class="slot-machine" aria-live="polite">
+        <span class="sm-icon" id="smIcon">🎰</span>
+        <b class="sm-name" id="smName">종목 뽑는 중…</b>
+        <small class="sm-desc" id="smDesc">&nbsp;</small>
+      </div>
+      <button type="button" class="go red" id="drawGo" disabled>이 종목으로 매수 주문하기</button>
+      <p class="small">후보 ${STOCKS.length}개 중 하나가 무작위로 뽑혀요. 회사 이름은 재미로 살짝 바꿔 썼고, 가격은 실제 주가예요.</p>`;
+    const show = (s) => { $("smIcon").textContent = s.icon; $("smName").textContent = s.name; $("smDesc").textContent = s.desc; };
+    const land = () => {
+      show(target);
+      $("smName").parentElement.classList.add("landed");
+      game.stock = target.id;
+      $("drawGo").disabled = false;
+    };
+    if (reduceMotion()) land();
+    else {
+      // 처음엔 빠르게, 점점 느리게 돌다가 멈춘다
+      let n = 0, delay = 60;
+      const spin = () => {
+        show(STOCKS[n++ % STOCKS.length]);
+        delay *= 1.12;
+        if (delay < 420) setTimeout(spin, delay); else land();
+      };
+      spin();
+    }
+    $("drawGo").addEventListener("click", () => { game.phase = "order"; renderGame(); });
+    return;
+  }
 
-  if (!game.done) {
+  const st = stockById(game.stock);
+  const pk = priceOf(st);
+
+  // 2) 매수 주문서
+  if (game.phase === "order") {
+    const first = res.monthly / pk[start];
+    g.innerHTML = `
+      <h2>매수 주문</h2>
+      <div class="acct order">
+        <div class="acct-row"><span>종목</span><b class="oname">${st.icon} ${st.name}</b></div>
+        <div class="acct-row sm"><span></span><span>${st.desc}</span></div>
+        <div class="acct-sep"></div>
+        <div class="acct-row"><span>1주 가격</span><span>${fmt(pk[start])}원 <small class="muted">(${res.year}년 1월)</small></span></div>
+        <div class="acct-row"><span>방식</span><span>매달 자동 매수</span></div>
+        <div class="acct-row"><span>금액</span><span>월 ${won(res.monthly)} <small class="muted">(= 내 ${esc(food)}값)</small></span></div>
+        <div class="acct-row"><span>기간</span><span>${res.year}년 1월부터</span></div>
+        <div class="fill buy" id="fill" hidden></div>
+      </div>
+      <button type="button" class="go red" id="orderBtn">매수 주문하기</button>`;
+    $("orderBtn").addEventListener("click", () => {
+      $("orderBtn").disabled = true;
+      const f = $("fill");
+      f.textContent = `✔ 첫 매수 체결 · ${st.name} ${shareStr(first)}주를 샀어요`;
+      f.hidden = false;
+      setTimeout(() => { game.phase = "play"; game.k = 0; renderGame(); }, reduceMotion() ? 400 : 1100);
+    });
+    return;
+  }
+
+  // 3) 사건 카드 — 내 종목이 먼저, 뉴스는 이유로
+  if (game.phase === "play") {
     const i = rounds[game.k];
     const ev = EVENTS[i];
-    const s = run(res.monthly, res.year, i, game.acts);
+    const s = run(res.monthly, res.year, i, game.acts, pk);
     const gain = s.total - s.spent;
     const pct = (s.total / s.spent - 1) * 100;
-    const dir = gain >= 0 ? "up" : "down";
-    const sign = gain >= 0 ? "▲ +" : "▼ ";
-    const acct = s.inMarket
-      ? `<div class="acct-row"><span>평가금액</span><b>${fmt(s.total)}원</b></div>
-         <div class="acct-row"><span>평가손익</span><span class="plv ${dir}">${sign}${fmt(Math.abs(gain))} (${gain >= 0 ? "+" : ""}${pct.toFixed(1)}%)</span></div>
+    const mchg = (pk[i] / pk[i - 1] - 1) * 100;
+    const mdir = mchg >= 0 ? "up" : "down";
+    const holding = s.inMarket
+      ? `<div class="hold-top"><b>${st.icon} ${st.name}</b><span class="plv ${mdir}">이번 달 ${pct1(mchg)}</span></div>
+         ${spark(pk, start, i)}
+         <div class="acct-row sm"><span>현재가</span><span>${fmt(pk[i])}원 · ${shareStr(s.units)}주 · 평균 단가 ${fmt(s.avg)}원</span></div>
          <div class="acct-sep"></div>
-         <div class="acct-row sm"><span>보유</span><span>주식시장 평균 · 투자원금 ${fmt(s.spent)}원</span></div>`
-      : `<div class="acct-row"><span>예수금(현금)</span><b>${fmt(s.total)}원</b></div>
-         <div class="acct-row"><span>평가손익</span><span class="plv">보유 종목 없음</span></div>
+         <div class="acct-row"><span>평가금액</span><b>${fmt(s.total)}원</b></div>
+         <div class="acct-row"><span>평가손익</span><span class="plv ${gain >= 0 ? "up" : "down"}">${gain >= 0 ? "▲ +" : "▼ "}${fmt(Math.abs(gain))} (${pct1(pct)})</span></div>`
+      : `<div class="hold-top"><b>보유 종목 없음</b><span class="plv ${mdir}">${st.name} 이번 달 ${pct1(mchg)}</span></div>
+         ${spark(pk, start, i)}
          <div class="acct-sep"></div>
-         <div class="acct-row sm"><span>보유</span><span>없음 · 투자원금 ${fmt(s.spent)}원</span></div>`;
+         <div class="acct-row"><span>예수금(현금)</span><b>${fmt(s.total)}원</b></div>
+         <div class="acct-row sm"><span>투자원금</span><span>${fmt(s.spent)}원</span></div>`;
     const choices = s.inMarket
       ? `<button type="button" class="choice" data-a="hold">보유 유지<small>계속 들고 간다</small></button>
          <button type="button" class="choice sell" data-a="sell">전량 매도<small>현금으로 바꾼다</small></button>`
@@ -686,8 +814,6 @@ function renderGame() {
          <button type="button" class="choice" data-a="wait">현금 유지<small>아직은 무섭다</small></button>`;
     const chat = [game.names[game.k % 2], CHAT[i][s.inMarket ? 0 : 1]];
     g.innerHTML = `
-      <h2>이 돈으로 주식을 했다면?</h2>
-      <p class="intro">매달 ${won(res.monthly)}씩 주식시장 평균에 넣었다고 쳐요. 실제로 있었던 사건마다 보유할지 팔지 골라 주세요.</p>
       <div class="progress" aria-label="사건 ${game.k + 1} / ${rounds.length}">${rounds.map((_, n) => `<i class="${n <= game.k ? "on" : ""}"></i>`).join("")}</div>
       <div class="ev ${reduceMotion() ? "" : "enter"}">
         <div class="news"><span class="flash">속보</span><span class="when">${when(i)} · 사건 ${game.k + 1}/${rounds.length}</span></div>
@@ -695,7 +821,7 @@ function renderGame() {
         <p class="sub">${ev.sub}</p>
         <div class="acct">
           <div class="acct-top"><span>내 계좌 · ${esc(food)}값 투자</span><span>${when(i)} 말</span></div>
-          ${acct}
+          ${holding}
           <div class="fill" id="fill" hidden></div>
         </div>
         <div class="chat"><span class="who">단톡방 · ${esc(chat[0])}</span><p>${chat[1]}</p></div>
@@ -711,24 +837,25 @@ function renderGame() {
       const fill = $("fill");
       fill.className = `fill ${a}`;
       fill.textContent = {
-        sell: `✔ 전량 매도 체결 · ${fmt(s.total)}원이 현금으로 들어왔어요`,
-        buy: `✔ 전량 매수 체결 · ${fmt(s.total)}원어치 샀어요`,
+        sell: `✔ 전량 매도 체결 · ${shareStr(s.units)}주 → ${fmt(s.total)}원`,
+        buy: `✔ 전량 매수 체결 · ${fmt(s.total)}원 → ${shareStr(s.total / pk[i])}주`,
         hold: "보유 유지 · 다음 사건까지 그대로 들고 가요",
         wait: "현금 유지 · 다음 사건까지 지켜봐요",
       }[a];
       fill.hidden = false;
       setTimeout(() => {
         game.k++;
-        if (game.k >= rounds.length) game.done = true;
+        if (game.k >= rounds.length) game.phase = "done";
         renderGame();
       }, reduceMotion() ? 400 : 1100);
     }));
     return;
   }
 
-  // 결과 판정
-  const mine = run(res.monthly, res.year, LAST, game.acts);
-  const hold = run(res.monthly, res.year, LAST, {});
+  // 4) 결과 판정
+  const mine = run(res.monthly, res.year, LAST, game.acts, pk);
+  const hold = run(res.monthly, res.year, LAST, {}, pk);
+  const bench = st.id === "spx" ? null : run(res.monthly, res.year, LAST, {}, priceOf(stockById("spx")));
   const sold = Object.values(game.acts).includes("sell");
   let type, punch;
   if (mine.total < mine.spent) {
@@ -736,7 +863,7 @@ function renderGame() {
     punch = `어차피 잃었겠네요. ${esc(food)}${josa(food, "으로", "로")} 배라도 불렀으니 다행이에요 🍗`;
   } else if (mine.total >= hold.total * 0.97 && !sold) {
     type = "강철 멘탈";
-    punch = `${esc(food)}값이 ${won(mine.total)}${josa(won(mine.total), "이", "가")} 됐겠네요. 배 아프죠?`;
+    punch = `${esc(food)}값이 ${st.name}에서 ${won(mine.total)}${josa(won(mine.total), "이", "가")} 됐겠네요. 배 아프죠?`;
   } else if (mine.total >= hold.total * 0.97) {
     type = "롤러코스터 개미";
     punch = `팔았다 다시 샀는데 결과는 그냥 버틴 거랑 비슷해요. 심장만 고생했네요.`;
@@ -744,54 +871,71 @@ function renderGame() {
     type = "팔랑귀";
     punch = `벌긴 벌었는데, 버텼으면 ${won(hold.total - mine.total)} 더 있었어요. 팔랑귀 인증.`;
   }
-  gameLine = `${res.rows[0].name}값으로 주식 했다면: 「${type}」 ${won(mine.total)}`;
-  lastGame = { type, total: mine.total };
+  const mPct = (mine.total / mine.spent - 1) * 100, hPct = (hold.total / hold.spent - 1) * 100;
+  const bPct = bench ? (bench.total / bench.spent - 1) * 100 : null;
+  gameLine = `${food}값으로 ${st.name} 샀다면: 「${type}」 ${won(mine.total)} (${pct1(mPct)})`;
+  lastGame = { type, total: mine.total, mPct, hPct, bPct, stock: st.name };
   $("shareOut").hidden = true;
   $("share").hidden = false;
   const friendRow = friend && friend.g
-    ? `<div class="r-line"><span>VS ${esc(friend.n)}님은 「${esc(friend.g)}」</span><span>${won(friend.gm)}</span></div>` : "";
+    ? `<div class="r-line"><span>VS ${esc(friend.n)}님은 「${esc(friend.g)}」${friend.s ? ` · ${esc(friend.s)}` : ""}</span><span>${won(friend.gm)}</span></div>` : "";
 
   // 수익률 막대: 먹은 돈은 -100%. 0 을 기준으로 왼쪽은 손실(파랑), 오른쪽은 수익(빨강).
-  const mPct = (mine.total / mine.spent - 1) * 100, hPct = (hold.total / hold.spent - 1) * 100;
-  const posMax = Math.max(10, mPct, hPct);
-  const zero = (100 / (100 + posMax)) * 100;
+  const posMax = Math.max(10, mPct, hPct, bPct ?? 0);
+  // 수익이 아주 크면(+100% 초과) 손실 칸이 안 보일 만큼 작아지므로, 0 의 위치를 35% 에 고정하고 양쪽을 따로 잰다
+  const zf = posMax <= 100 ? 100 / (100 + posMax) : 0.35;
+  const zero = zf * 100;
   const bar = (label, sub, v, me) => {
-    const w = (Math.abs(v) / (100 + posMax)) * 100;
+    const w = v < 0 ? (Math.abs(v) / 100) * zf * 100 : (v / posMax) * (1 - zf) * 100;
     const pos = v >= 0;
     return `<div class="bar-row ${me ? "me" : ""}">
-      <div class="bar-label"><span>${label}</span><span class="bar-v ${pos ? "up" : "down"}">${pos ? "+" : ""}${v.toFixed(1)}%</span></div>
+      <div class="bar-label"><span>${label}</span><span class="bar-v ${pos ? "up" : "down"}">${pct1(v)}</span></div>
       <div class="track"><i class="zero" style="left:${zero}%"></i><i class="bar ${pos ? "up" : "down"}" style="${pos ? `left:${zero}%` : `right:${100 - zero}%`};--w:${w}%"></i></div>
       <div class="bar-sub">${sub}</div>
     </div>`;
   };
+  // 같은 선택(매도·매수 시점)을 다른 종목에 그대로 적용했을 때 가장 좋았을 종목과 나빴을 종목
+  const others = STOCKS.filter((o) => o.id !== st.id).map((o) => {
+    const r = run(res.monthly, res.year, LAST, game.acts, priceOf(o));
+    return { o, p: (r.total / r.spent - 1) * 100 };
+  }).sort((a, b) => b.p - a.p);
+  const best = others[0], worst = others[others.length - 1];
+  const luckLine = `🎰 같은 선택이어도 <b>${best.o.name}</b>${josa(best.o.name, "이", "가")} 뽑혔다면 <b class="up-t">${pct1(best.p)}</b>, <b>${worst.o.name}</b>${josa(worst.o.name, "이", "가")} 뽑혔다면 <b class="down-t">${pct1(worst.p)}</b>였어요. 무엇이 뽑히느냐는 운이에요.`;
   const unitPrice = res.rows[0].spent / res.rows[0].count;
   const unit = res.rows[0].h.unit;
   const more = Math.round((hold.total - mine.total) / unitPrice);
   const diffLine = more >= 1
-    ? `버텼으면 ${esc(food)} <b>${fmt(more)}${esc(unit)}</b>${josa(unit, "을", "를")} 더 먹을 수 있었어요.`
+    ? `버텼으면 ${esc(food)} <b>${fmt(more)}${esc(unit)}</b>${josa(unit, "을", "를")} 더 살 수 있었어요.`
     : `먹는 대신 넣었다면 ${esc(food)} <b>${fmt(Math.max(0, mine.total - mine.spent) / unitPrice)}${esc(unit)}</b>${josa(unit, "이", "가")} 공짜로 생긴 셈이에요.`;
   g.innerHTML = `
     <div class="verdict">
-      <div class="small">당신의 투자 성향</div>
+      <div class="small">${st.icon} ${st.name}${josa(st.name, "을", "를")} 산 당신의 투자 성향</div>
       <div class="stamp-wrap"><div class="stamp ${reduceMotion() ? "" : "thunk"}"><small>판정</small><strong>${type}</strong></div></div>
-      <p class="myret ${mPct >= 0 ? "up" : "down"}">내 수익률 ${mPct >= 0 ? "+" : ""}${mPct.toFixed(1)}%</p>
+      <p class="myret ${mPct >= 0 ? "up" : "down"}">내 수익률 ${pct1(mPct)}</p>
       <p class="punch">${punch}</p>
       <div class="bars" id="bars">
         ${bar(`${res.rows[0].h.icon} 그냥 ${esc(food)}에 씀`, "0원 · 추억만 남음", -100, false)}
         ${bar(`😎 내 선택 (${type})`, won(mine.total), mPct, true)}
-        ${bar("💪 끝까지 보유", won(hold.total), hPct, false)}
+        ${bar(`💪 ${st.name} 끝까지 보유`, won(hold.total), hPct, false)}
+        ${bench ? bar("🧺 묶음(미국 대표 500)이었다면", won(bench.total), bPct, false) : ""}
       </div>
       <p class="diff">${diffLine}</p>
+      <p class="luck">${luckLine}</p>
       ${friendRow ? `<div class="cmp">${friendRow}</div>` : ""}
       <ul class="log">${game.log.map((l) => `<li>${l}</li>`).join("")}</ul>
-      <p class="lesson">결과를 가른 건 무엇을 샀느냐가 아니라 <b>떨어질 때 어떻게 했느냐</b>였어요. 앞으로 아낀 돈은, 사기 전에 공부부터.</p>
+      <p class="lesson">같은 돈, 같은 시기여도 <b>무엇을 샀는지</b>, <b>떨어질 때 어떻게 했는지</b>에 따라 결과가 이렇게 갈려요. 앞으로 아낀 돈은, 사기 전에 공부부터.</p>
       <button type="button" class="go red" id="appBtn">앱에서 주식 공부 시작하기</button>
-      <button type="button" class="btn" id="againBtn">다른 선택으로 다시 해 보기</button>
-      <p class="small">지난 결과일 뿐 앞으로도 그렇다는 보장은 없어요.</p>
+      <button type="button" class="btn" id="againBtn">🎰 다른 종목 뽑아서 다시 하기</button>
+      <p class="small">지난 결과일 뿐 앞으로도 그렇다는 보장은 없어요. 특정 종목을 사라는 뜻이 아니에요.</p>
     </div>`;
   requestAnimationFrame(() => requestAnimationFrame(() => $("bars").classList.add("go")));
   $("appBtn").addEventListener("click", () => toast("배포 버전에서는 앱 설치 스토어(App Store · Google Play)로 이동해요."));
-  $("againBtn").addEventListener("click", () => { game = { res, k: 0, acts: {}, log: [], done: false, names: pickChatNames() }; gameLine = ""; renderGame(); });
+  $("againBtn").addEventListener("click", () => {
+    game = { res, phase: "pick", k: 0, acts: {}, log: [], names: pickChatNames() };
+    gameLine = "";
+    renderGame();
+    $("game").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  });
 }
 
 function buildControls() {
@@ -871,7 +1015,7 @@ $("copyBtn").addEventListener("click", () => copy(shareText(true), "복사했어
 $("duelBtn").addEventListener("click", () => copy(duelUrl(), `도전장 링크를 복사했어요. 친구가 열면 「${nick()}님의 도전장」이 떠요.`));
 
 // ── 결과 이미지(스토리 1080×1920)와 카톡 미리보기(1200×630) ──────────────
-const IMG = { ground: "#eceef3", paper: "#ffffff", ink: "#1c1d20", muted: "#6d6f75", red: "#d8261f" };
+const IMG = { ground: "#eceef3", paper: "#ffffff", ink: "#1c1d20", muted: "#6d6f75", red: "#d8261f", blue: "#2a63d9" };
 const F = { display: '"Black Han Sans", "Malgun Gothic", sans-serif', mono: '"Nanum Gothic Coding", Consolas, monospace', body: '"IBM Plex Sans KR", "Malgun Gothic", sans-serif' };
 
 function wrapLines(ctx, text, maxW) {
@@ -883,11 +1027,23 @@ function wrapLines(ctx, text, maxW) {
   if (line) out.push(line);
   return out;
 }
+// 도장 글자 줄 나누기: 한 줄에 들어가면 한 줄, 아니면 단어 경계에서 두 줄 폭이 가장 고른 곳을 고른다.
+function stampLines(ctx, text, maxW) {
+  if (ctx.measureText(text).width <= maxW) return [text];
+  const words = text.split(" ");
+  let best = null;
+  for (let k = 1; k < words.length; k++) {
+    const a = words.slice(0, k).join(" "), b = words.slice(k).join(" ");
+    const wmax = Math.max(ctx.measureText(a).width, ctx.measureText(b).width);
+    if (!best || wmax < best.w) best = { w: wmax, lines: [a, b] };
+  }
+  return best && best.w <= maxW ? best.lines : wrapLines(ctx, text, maxW);
+}
 function drawStamp(ctx, cx, cy, label, title, size) {
   ctx.save();
   ctx.translate(cx, cy); ctx.rotate(-6 * Math.PI / 180);
   ctx.font = `${size}px ${F.display}`;
-  const lines = wrapLines(ctx, title, size * 9);
+  const lines = stampLines(ctx, title, size * 9);
   const w = Math.max(...lines.map((l) => ctx.measureText(l).width)) + size * 1.4;
   const h = lines.length * size * 1.2 + size * 1.5;
   ctx.strokeStyle = IMG.red; ctx.fillStyle = IMG.red;
@@ -907,10 +1063,17 @@ function drawStory() {
   ctx.fillStyle = IMG.ground; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = IMG.ink; ctx.textAlign = "center";
   ctx.font = `80px ${F.display}`; ctx.fillText("그 치킨, 다 모으면 얼마?", W / 2, 210);
-  ctx.font = `40px ${F.body}`; ctx.fillStyle = IMG.muted; ctx.fillText(`${nick()}님의 소비 영수증`, W / 2, 290);
+  ctx.font = `40px ${F.body}`; ctx.fillStyle = IMG.muted; ctx.fillText(`${whose()} 소비 영수증`, W / 2, 290);
 
-  // receipt paper with zigzag bottom
-  const x = 110, y = 360, w = W - 220, h = 1180, t = 22;
+  // 배치를 먼저 계산하고 영수증 종이 길이를 맞춘다: 항목 → TOTAL → 칭호 도장 → (게임을 했으면) 수익률 막대
+  const x = 110, y = 360, w = W - 220, t = 22, ROW = 56;
+  const shown = res.rows.slice(0, 3), extra = res.rows.length - shown.length;
+  const totalY = y + 250 + (shown.length + (extra > 0 ? 1 : 0)) * ROW + 90;
+  const stampY = totalY + 185;
+  const barsTop = totalY + 400;
+  const end = lastGame ? barsTop + 50 + (lastGame.bPct != null ? 4 : 3) * 72 + 10 : stampY + 140;
+  const h = end - y + 60;
+
   ctx.fillStyle = IMG.paper; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + h);
   for (let px = x + w; px > x; px -= t * 2) { ctx.lineTo(px - t, y + h - t); ctx.lineTo(px - t * 2, y + h); }
   ctx.closePath(); ctx.fill();
@@ -921,22 +1084,44 @@ function drawStory() {
   dash(y + 180);
   let yy = y + 250;
   ctx.font = `36px ${F.mono}`;
-  res.rows.slice(0, 4).forEach((r) => {
+  shown.forEach((r) => {
     ctx.fillStyle = IMG.ink; ctx.textAlign = "left"; ctx.fillText(`${r.name} × ${fmt(r.count)}${r.h.unit}`, x + 60, yy);
-    ctx.textAlign = "right"; ctx.fillText(fmt(r.spent), x + w - 60, yy); yy += 62;
+    ctx.textAlign = "right"; ctx.fillText(fmt(r.spent), x + w - 60, yy); yy += ROW;
   });
-  if (res.rows.length > 4) { ctx.textAlign = "left"; ctx.fillStyle = IMG.muted; ctx.fillText(`외 ${res.rows.length - 4}개`, x + 60, yy); yy += 62; }
-  dash(yy - 20); yy += 70;
-  ctx.textAlign = "left"; ctx.fillStyle = IMG.ink; ctx.font = `bold 40px ${F.mono}`; ctx.fillText("TOTAL", x + 60, yy);
-  ctx.textAlign = "right"; ctx.font = `100px ${F.display}`; ctx.fillText(won(res.total), x + w - 60, yy + 6);
-  drawStamp(ctx, W / 2, yy + 260, "공식 인증 칭호", receiptTitle, 64);
+  if (extra > 0) { ctx.textAlign = "left"; ctx.fillStyle = IMG.muted; ctx.fillText(`외 ${extra}개`, x + 60, yy); }
+  dash(totalY - 100);
+  ctx.textAlign = "left"; ctx.fillStyle = IMG.ink; ctx.font = `bold 40px ${F.mono}`; ctx.fillText("TOTAL", x + 60, totalY);
+  ctx.textAlign = "right"; ctx.font = `100px ${F.display}`; ctx.fillText(won(res.total), x + w - 60, totalY + 6);
+  drawStamp(ctx, W / 2, stampY, "공식 인증 칭호", receiptTitle, 54);
+
   if (lastGame) {
-    ctx.textAlign = "center"; ctx.fillStyle = IMG.ink; ctx.font = `40px ${F.body}`;
-    ctx.fillText(`${res.rows[0].name}값으로 주식 했다면`, W / 2, y + h - 150);
-    ctx.font = `64px ${F.display}`; ctx.fillStyle = IMG.red; ctx.fillText(`「${lastGame.type}」`, W / 2, y + h - 70);
+    // 수익률 막대: 화면의 막대와 같은 규칙 — 먹은 돈 -100%, 0 기준 왼쪽 손실(파랑)·오른쪽 수익(빨강)
+    dash(barsTop - 50);
+    ctx.textAlign = "center"; ctx.fillStyle = IMG.ink; ctx.font = `38px ${F.body}`;
+    ctx.fillText(`${res.rows[0].name}값으로 ${lastGame.stock} 샀다면`, W / 2, barsTop + 10);
+    const L = x + 60, R = x + w - 60, posMax = Math.max(10, lastGame.mPct, lastGame.hPct, lastGame.bPct ?? 0);
+    const zf = posMax <= 100 ? 100 / (100 + posMax) : 0.35; // 화면 막대와 같은 눈금
+    const zeroX = L + (R - L) * zf;
+    const rows = [
+      [`그냥 ${res.rows[0].name}에 씀`, -100],
+      [`내 선택 「${lastGame.type}」`, lastGame.mPct],
+      [`${lastGame.stock} 끝까지 보유`, lastGame.hPct],
+    ];
+    if (lastGame.bPct != null) rows.push(["묶음(미국 대표 500)이었다면", lastGame.bPct]);
+    rows.forEach(([label, v], k) => {
+      const ty = barsTop + 70 + k * 72;
+      const pos = v >= 0, col = pos ? IMG.red : IMG.blue;
+      ctx.textAlign = "left"; ctx.fillStyle = IMG.ink; ctx.font = `${k === 1 ? "bold " : ""}32px ${F.body}`; ctx.fillText(label, L, ty);
+      ctx.textAlign = "right"; ctx.fillStyle = col; ctx.font = `40px ${F.display}`; ctx.fillText(`${pos ? "+" : ""}${v.toFixed(1)}%`, R, ty + 2);
+      ctx.fillStyle = IMG.ground; ctx.fillRect(L, ty + 14, R - L, 22);
+      const bw = (R - L) * (v < 0 ? (Math.abs(v) / 100) * zf : (v / posMax) * (1 - zf));
+      ctx.fillStyle = col; ctx.fillRect(pos ? zeroX : zeroX - bw, ty + 14, bw, 22);
+      ctx.fillStyle = IMG.muted; ctx.fillRect(zeroX - 1, ty + 10, 2, 30);
+    });
   }
-  ctx.textAlign = "center"; ctx.fillStyle = IMG.ink; ctx.font = `88px ${F.display}`; ctx.fillText("너는 뭐 나옴?", W / 2, 1700);
-  ctx.font = `36px ${F.body}`; ctx.fillStyle = IMG.muted; ctx.fillText("내 영수증 뽑으러 가기 ↗ 링크는 프로필에", W / 2, 1770);
+  const footY = Math.min(Math.max(y + h + 130, 1720), 1830); // 항목이 많아 종이가 길어져도 1920 안에 들어가게
+  ctx.textAlign = "center"; ctx.fillStyle = IMG.ink; ctx.font = `88px ${F.display}`; ctx.fillText("너는 뭐 나옴?", W / 2, footY);
+  ctx.font = `36px ${F.body}`; ctx.fillStyle = IMG.muted; ctx.fillText("내 영수증 뽑으러 가기 ↗ 링크는 프로필에", W / 2, footY + 62);
   return c.toDataURL("image/png");
 }
 function drawOg() {
@@ -946,9 +1131,16 @@ function drawOg() {
   ctx.fillStyle = IMG.paper; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = IMG.ground; ctx.fillRect(0, 0, W, 120);
   ctx.fillStyle = IMG.ink; ctx.textAlign = "left"; ctx.font = `52px ${F.display}`; ctx.fillText("그 치킨, 다 모으면 얼마?", 60, 82);
-  drawStamp(ctx, W / 2, 330, `${nick()}님의 칭호`, receiptTitle, 70);
+  drawStamp(ctx, W / 2, 330, `${whose()} 칭호`, receiptTitle, 70);
   ctx.textAlign = "center"; ctx.fillStyle = IMG.muted; ctx.font = `36px ${F.body}`;
-  ctx.fillText(`${res.year}년부터 ${won(res.total)}${lastGame ? ` · 투자 성향 「${lastGame.type}」` : ""}`, W / 2, 570);
+  if (lastGame) {
+    const p = lastGame.mPct;
+    ctx.font = `34px ${F.body}`; ctx.fillText(`${won(res.total)}으로 ${lastGame.stock} 샀다면 「${lastGame.type}」`, W / 2, 548);
+    ctx.font = `44px ${F.display}`; ctx.fillStyle = p >= 0 ? IMG.red : IMG.blue;
+    ctx.fillText(`내 수익률 ${p >= 0 ? "+" : ""}${p.toFixed(1)}%  vs  ${res.rows[0].name} -100%`, W / 2, 605);
+  } else {
+    ctx.fillText(`${res.year}년부터 ${won(res.total)}`, W / 2, 570);
+  }
   return c.toDataURL("image/png");
 }
 $("saveBtn").addEventListener("click", async () => {
@@ -959,7 +1151,7 @@ $("saveBtn").addEventListener("click", async () => {
   } catch (_) { /* 글꼴을 못 불러와도 기본 글꼴로 그린다 */ }
   $("storyImg").src = drawStory();
   $("ogImg").src = drawOg();
-  $("ogTitle").textContent = `${nick()}님의 칭호는 「${receiptTitle}」`;
+  $("ogTitle").textContent = `${whose()} 칭호는 「${receiptTitle}」`;
   $("ogDesc").textContent = `${lastRes.year}년부터 ${won(lastRes.total)} 썼대요. 너는 뭐 나옴?`;
   $("shareOut").hidden = false;
   toast("");
@@ -976,12 +1168,12 @@ $("game").hidden = true; // 영수증을 뽑기 전에는 영수증·게임·자
 // 영수증 밑 버튼이 화면 밖으로 나가 있으면 같은 버튼을 화면 아래에 띄운다(게임을 시작하면 사라짐).
 let ctaVisible = false;
 function updateDock() {
-  const waiting = game && game.k < 0 && !$("nextCta").hidden;
+  const waiting = game && game.phase === "idle" && !$("nextCta").hidden;
   $("dock").hidden = !(waiting && !ctaVisible);
 }
 function startGame() {
-  if (!game || game.k >= 0) return;
-  game.k = 0;
+  if (!game || game.phase !== "idle") return;
+  game.phase = "pick";
   renderGame();
   $("game").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
 }
