@@ -1,0 +1,996 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지 계산해 드려요.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="치킨 영수증">
+<meta property="og:description" content="치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지 계산해 드려요.">
+<meta property="og:url" content="https://sujin412.github.io/chicken-receipt/">
+<style>html{color-scheme:light}body{margin:0;-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>치킨 영수증</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-width column — pick habits, print a thermal receipt with a red ink title stamp,
+   then "what if that money was in stocks?": hold-or-sell event cards ending in an investor-type verdict and the app CTA. */
+:root {
+  --ground: #eceef3;
+  --surface: #ffffff;
+  --line: #d5d9e2;
+  --fg: #191b21;
+  --muted: #646a79;
+  --ink: #d8261f;
+  --ink-soft: rgba(216, 38, 31, 0.10);
+  --cool: #2a63d9;
+  --cool-soft: rgba(42, 99, 217, 0.10);
+  --paper: #ffffff;
+  --paper-ink: #1c1d20;
+  --paper-muted: #6d6f75;
+  --chip-on: #191b21;
+  --chip-on-fg: #ffffff;
+  --on-ink: #ffffff;
+  --shadow: 0 1px 0 rgba(20, 24, 36, 0.06), 0 10px 30px rgba(20, 24, 36, 0.10);
+
+  --f-display: "Black Han Sans", "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --f-mono: "Nanum Gothic Coding", "D2Coding", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #121419; --surface: #1c1f27; --line: #2e3340; --fg: #eef0f5; --muted: #9aa1b2;
+    --ink: #ff5148; --ink-soft: rgba(255, 81, 72, 0.14); --cool: #6b9bff; --cool-soft: rgba(107, 155, 255, 0.14);
+    --paper: #f3f1ec; --paper-ink: #1c1d20; --paper-muted: #6d6f75;
+    --chip-on: #eef0f5; --chip-on-fg: #121419; --on-ink: #ffffff;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #121419; --surface: #1c1f27; --line: #2e3340; --fg: #eef0f5; --muted: #9aa1b2;
+  --ink: #ff5148; --ink-soft: rgba(255, 81, 72, 0.14); --cool: #6b9bff; --cool-soft: rgba(107, 155, 255, 0.14);
+  --paper: #f3f1ec; --paper-ink: #1c1d20; --paper-muted: #6d6f75;
+  --chip-on: #eef0f5; --chip-on-fg: #121419; --on-ink: #ffffff;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 460px; margin: 0 auto; padding: 28px 16px 48px; display: grid; gap: 20px; }
+
+header { display: grid; gap: 6px; }
+.eyebrow { font-size: 12px; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(34px, 10vw, 44px); line-height: 1.12; margin: 0; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--ink); }
+.lede { margin: 0; color: var(--muted); }
+
+form { display: grid; gap: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 16px; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 8px; min-width: 0; }
+legend { font-weight: 700; font-size: 14px; padding: 0; margin-bottom: 8px; }
+.hint { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips input, .seg input { position: absolute; opacity: 0; pointer-events: none; }
+.chips label { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; font-size: 14px; background: var(--surface); user-select: none; }
+.chips input:checked + label { background: var(--chip-on); color: var(--chip-on-fg); border-color: var(--chip-on); }
+.chips input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.items { display: grid; gap: 10px; }
+.item { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; padding: 12px; border-radius: 10px; background: var(--ground); }
+.item > * { min-width: 0; }
+.item .iname { grid-column: 1 / -1; font-weight: 700; font-size: 14px; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: 12px; color: var(--muted); }
+input[type="text"], input[type="number"], select {
+  width: 100%; font: inherit; font-size: 16px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--surface); color: var(--fg); font-variant-numeric: tabular-nums;
+}
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg label { text-align: center; padding: 9px 0; cursor: pointer; font-size: 14px; font-variant-numeric: tabular-nums; border-left: 1px solid var(--line); }
+.seg label:first-of-type { border-left: 0; }
+.seg input:checked + label { background: var(--chip-on); color: var(--chip-on-fg); font-weight: 700; }
+.seg input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+.print { font: inherit; font-family: var(--f-display); font-size: 20px; letter-spacing: 0.02em; padding: 14px; border-radius: 12px; border: 0; background: var(--ink); color: var(--on-ink); cursor: pointer; }
+.print:active { transform: translateY(1px); }
+
+/* receipt */
+.slot { display: grid; gap: 6px; }
+.slot-label { font-size: 12px; color: var(--muted); text-align: center; }
+.receipt {
+  position: relative; background: var(--paper); color: var(--paper-ink); font-family: var(--f-mono); padding: 22px 20px 34px; box-shadow: var(--shadow);
+  -webkit-mask: radial-gradient(circle at 50% 100%, transparent 6px, #000 6.5px) bottom / 18px 9px repeat-x, linear-gradient(#000, #000) top / 100% calc(100% - 8px) no-repeat;
+          mask: radial-gradient(circle at 50% 100%, transparent 6px, #000 6.5px) bottom / 18px 9px repeat-x, linear-gradient(#000, #000) top / 100% calc(100% - 8px) no-repeat;
+  display: grid; gap: 12px; font-variant-numeric: tabular-nums;
+}
+.r-head { text-align: center; display: grid; gap: 2px; }
+.r-head strong { font-size: 16px; letter-spacing: 0.12em; }
+.r-head span { font-size: 12px; color: var(--paper-muted); }
+.dash { border: 0; border-top: 1px dashed var(--paper-muted); margin: 0; opacity: 0.6; }
+.r-line { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.r-line span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.r-line span:last-child { white-space: nowrap; }
+.r-total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.r-total span:first-child { font-weight: 700; letter-spacing: 0.1em; }
+.r-total b { font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 10vw, 42px); line-height: 1; }
+.r-pace { font-size: 12px; color: var(--paper-muted); margin: -4px 0 0; text-align: right; }
+.roast { font-family: var(--f-body); font-size: 17px; font-weight: 700; margin: 0; line-height: 1.45; text-wrap: balance; }
+.facts { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 13px; }
+.facts li { display: grid; grid-template-columns: 1.4em 1fr; gap: 4px; }
+.facts li > span:last-child { min-width: 0; }
+
+.stamp-wrap { display: grid; justify-items: center; padding: 6px 0 2px; }
+.stamp {
+  border: 3px solid var(--ink); color: var(--ink); border-radius: 10px; padding: 8px 14px 9px; text-align: center;
+  transform: rotate(-6deg); display: grid; gap: 2px; max-width: 92%;
+  box-shadow: inset 0 0 0 2px var(--paper), inset 0 0 0 3px var(--ink);
+}
+.stamp small { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em; }
+.stamp strong { font-family: var(--f-display); font-weight: 400; font-size: clamp(22px, 7vw, 28px); line-height: 1.15; text-wrap: balance; }
+
+.r-foot { text-align: center; font-size: 12px; color: var(--paper-muted); display: grid; gap: 6px; justify-items: center; }
+.barcode { height: 34px; width: 70%; background: repeating-linear-gradient(90deg, var(--paper-ink) 0 2px, transparent 2px 4px, var(--paper-ink) 4px 5px, transparent 5px 8px, var(--paper-ink) 8px 11px, transparent 11px 12px); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .receipt.printing { animation: feed .5s ease-out both; }
+  .receipt.printing .pl { animation: lineIn .22s ease-out both; animation-delay: calc(var(--d) * 150ms + 250ms); }
+  .receipt.printing .stamp, .stamp.thunk { animation: stampIn .42s cubic-bezier(.2, 1.4, .4, 1) both; animation-delay: var(--sd, 0ms); }
+  .ev.enter { animation: cardIn .3s ease-out both; }
+}
+@keyframes feed { from { transform: translateY(-24px); clip-path: inset(0 0 100% 0); } to { transform: none; clip-path: inset(0 0 0 0); } }
+@keyframes lineIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes stampIn {
+  0% { opacity: 0; transform: rotate(-6deg) scale(2.4); }
+  60% { opacity: 1; transform: rotate(-6deg) scale(0.92); }
+  100% { opacity: 1; transform: rotate(-6deg) scale(1); }
+}
+@keyframes cardIn { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.btn { font: inherit; font-weight: 700; font-size: 14px; padding: 12px 6px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.btn.primary { background: var(--fg); color: var(--ground); border-color: var(--fg); }
+.toast { font-size: 13px; color: var(--muted); text-align: center; min-height: 1.4em; margin: -10px 0 0; overflow-wrap: anywhere; white-space: pre-line; }
+
+/* stock game */
+.game { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 16px; display: grid; gap: 14px; }
+.game h2 { font-family: var(--f-display); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 0; text-wrap: balance; }
+.game .intro { margin: 0; color: var(--muted); font-size: 14px; }
+.go { font: inherit; font-weight: 700; font-size: 16px; padding: 14px; border-radius: 12px; border: 0; background: var(--fg); color: var(--ground); cursor: pointer; }
+.go.red { background: var(--ink); color: var(--on-ink); }
+
+.progress { display: flex; gap: 6px; }
+.progress i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+.progress i.on { background: var(--fg); }
+.ev { display: grid; gap: 10px; }
+.ev .when { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.ev .head { font-family: var(--f-display); font-weight: 400; font-size: 24px; line-height: 1.2; margin: 0; text-wrap: balance; }
+.ev .sub { margin: 0; font-size: 14px; color: var(--muted); }
+.bal { border-radius: 10px; padding: 12px; display: grid; gap: 2px; font-variant-numeric: tabular-nums; }
+.bal.up { background: var(--ink-soft); }
+.bal.down { background: var(--cool-soft); }
+.bal.cash { background: var(--ground); }
+.bal small { font-size: 12px; color: var(--muted); }
+.bal b { font-family: var(--f-display); font-weight: 400; font-size: 28px; line-height: 1.1; }
+.bal .pct { font-weight: 700; font-size: 14px; }
+.bal.up .pct { color: var(--ink); }
+.bal.down .pct { color: var(--cool); }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.choice { font: inherit; font-weight: 700; font-size: 15px; padding: 14px 8px; border-radius: 12px; border: 1px solid var(--line); background: var(--ground); color: var(--fg); cursor: pointer; display: grid; gap: 2px; }
+.choice small { font-weight: 400; font-size: 12px; color: var(--muted); }
+.log { margin: 0; padding: 0; list-style: none; font-size: 12px; color: var(--muted); display: grid; gap: 2px; }
+
+.verdict { display: grid; gap: 12px; }
+.verdict .stamp-wrap { padding: 4px 0 6px; }
+.verdict .stamp { --paper: var(--surface); }
+.punch { font-size: 18px; font-weight: 700; margin: 0; line-height: 1.45; text-wrap: balance; }
+.cmp { display: grid; gap: 6px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.cmp .me { font-weight: 700; }
+.lesson { margin: 0; font-size: 14px; background: var(--ground); border-radius: 10px; padding: 12px; }
+.small { font-size: 12px; color: var(--muted); margin: 0; }
+
+/* 결과 화면 상단: 다시 뽑기 */
+.topbar { display: flex; align-items: center; gap: 12px; }
+.topbar span { font-size: 13px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.back { font: inherit; font-weight: 700; font-size: 14px; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; white-space: nowrap; }
+
+/* 영수증 → 주식 게임 버튼 */
+.next-cta {
+  font: inherit; cursor: pointer; border: 0; border-radius: 14px; margin-top: 14px;
+  background: var(--ink); color: var(--on-ink); padding: 16px 18px; display: grid; gap: 4px; text-align: left;
+  box-shadow: 0 8px 24px var(--ink-soft);
+}
+.next-cta span { font-family: var(--f-display); font-size: clamp(20px, 6vw, 24px); line-height: 1.25; text-wrap: balance; }
+.next-cta small { font-size: 13px; opacity: 0.9; }
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(transparent, var(--ground) 35%); display: grid; justify-items: center; }
+.dock-btn { font: inherit; font-family: var(--f-display); font-size: 18px; cursor: pointer; border: 0; border-radius: 999px; padding: 14px 22px; width: min(428px, 100%); background: var(--ink); color: var(--on-ink); box-shadow: var(--shadow); }
+@media (prefers-reduced-motion: no-preference) {
+  .next-cta.appear { animation: ctaIn .45s cubic-bezier(.2, 1.3, .4, 1) both, nudge 1.6s ease-in-out 3; animation-delay: var(--cd), calc(var(--cd) + .6s); }
+  .dock:not([hidden]) { animation: lineIn .25s ease-out both; }
+}
+@keyframes ctaIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes nudge { 0%, 100% { transform: none; } 50% { transform: translateY(-3px); } }
+
+/* 증권 앱 계좌 화면 */
+.news { display: flex; align-items: center; gap: 8px; }
+.flash { background: var(--ink); color: var(--on-ink); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.06em; }
+.acct { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; font-variant-numeric: tabular-nums; background: var(--surface); overflow: hidden; }
+.acct-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.acct-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; }
+.acct-row > span:first-child { color: var(--muted); white-space: nowrap; }
+.acct-row > :last-child { min-width: 0; text-align: right; overflow-wrap: anywhere; }
+.acct-row b { font-family: var(--f-display); font-weight: 400; font-size: 28px; line-height: 1.1; }
+.acct-row.sm { font-size: 12px; }
+.acct-sep { border-top: 1px solid var(--line); }
+.plv { font-weight: 700; font-size: 16px; }
+.plv.up { color: var(--ink); }
+.plv.down { color: var(--cool); }
+.fill { position: absolute; inset: auto 8px 8px 8px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--on-ink); background: var(--fg); }
+.fill.sell { background: var(--cool); }
+.fill.buy { background: var(--ink); }
+.fill.hold, .fill.wait { background: var(--fg); color: var(--ground); }
+.choice.sell { background: var(--cool); border-color: var(--cool); color: var(--on-ink); }
+.choice.buy { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
+.choice.sell small, .choice.buy small { color: inherit; opacity: 0.85; }
+.choice[disabled] { opacity: 0.55; cursor: default; }
+@media (prefers-reduced-motion: no-preference) {
+  .fill:not([hidden]) { animation: lineIn .2s ease-out both; }
+}
+
+.chat { justify-self: start; max-width: 85%; display: grid; gap: 2px; }
+.chat .who { font-size: 11px; color: var(--muted); }
+.chat p { margin: 0; background: #fee500; color: #191919; padding: 8px 12px; border-radius: 4px 14px 14px 14px; font-size: 14px; }
+
+/* 결과 수익률 막대 */
+.myret { font-family: var(--f-display); font-size: clamp(34px, 10vw, 44px); line-height: 1.1; margin: 0; text-align: center; }
+.myret.up { color: var(--ink); }
+.myret.down { color: var(--cool); }
+.bars { display: grid; gap: 12px; }
+.bar-row { display: grid; gap: 4px; }
+.bar-label { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.bar-row.me .bar-label { font-weight: 700; }
+.bar-v { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar-v.up { color: var(--ink); }
+.bar-v.down { color: var(--cool); }
+.track { position: relative; height: 14px; border-radius: 7px; background: var(--ground); overflow: hidden; }
+.track .zero { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--muted); opacity: 0.5; }
+.track .bar { position: absolute; top: 0; bottom: 0; width: var(--w); border-radius: 7px; }
+.track .bar.up { background: var(--ink); }
+.track .bar.down { background: var(--cool); }
+@media (prefers-reduced-motion: no-preference) {
+  .track .bar { width: 0; transition: width .9s cubic-bezier(.2, .8, .2, 1); }
+  .bars.go .bar { width: var(--w); }
+  .bars.go .bar-row:nth-child(2) .bar { transition-delay: .25s; }
+  .bars.go .bar-row:nth-child(3) .bar { transition-delay: .5s; }
+}
+.bar-sub { font-size: 12px; color: var(--muted); }
+.diff { margin: 0; font-size: 16px; text-align: center; }
+.diff b { color: var(--ink); font-size: 20px; }
+
+.notes { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
+.notes p { margin: 0; }
+.proto { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 6px !important; }
+
+/* duel banner + vs */
+.duel { background: var(--fg); color: var(--ground); border-radius: 14px; padding: 16px; display: grid; gap: 6px; }
+.duel .tag { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.12em; opacity: 0.8; }
+.duel p { margin: 0; }
+.duel .big { font-family: var(--f-display); font-size: 24px; line-height: 1.25; text-wrap: balance; }
+.duel .meta { font-size: 13px; opacity: 0.85; }
+.vs { border: 2px solid var(--fg); border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px; font-size: 14px; }
+.vs b { font-family: var(--f-display); font-weight: 400; font-size: 20px; line-height: 1.3; }
+
+/* share */
+.share { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 16px; display: grid; gap: 12px; }
+.share h2 { font-family: var(--f-display); font-weight: 400; font-size: 24px; margin: 0; }
+.share-out { display: grid; gap: 16px; justify-items: center; }
+.share-out figure { margin: 0; display: grid; gap: 6px; justify-items: center; }
+.share-out img.story { width: min(240px, 70vw); border-radius: 12px; box-shadow: var(--shadow); }
+.share-out figcaption, .kcap { font-size: 12px; color: var(--muted); text-align: center; }
+.kakao { width: min(300px, 100%); background: #b2c7d9; border-radius: 14px; padding: 14px; display: grid; gap: 6px; }
+.kbubble { background: #ffffff; color: #191919; border-radius: 10px; overflow: hidden; display: grid; }
+.kbubble img { display: block; width: 100%; height: auto; }
+.kbubble .kt { padding: 10px 12px 2px; font-weight: 700; font-size: 14px; }
+.kbubble .kd { padding: 0 12px 10px; font-size: 12px; color: #555555; }
+.kbubble .kb { border-top: 1px solid #e5e5e5; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar" id="topbar" hidden>
+    <button type="button" class="back" id="backBtn">← 다시 뽑기</button>
+    <span>그 치킨, 다 모으면 얼마?</span>
+  </div>
+
+  <header id="intro">
+    <div class="eyebrow">소비 영수증 발급기</div>
+    <h1>그 치킨,<br><em>다 모으면</em> 얼마?</h1>
+    <p class="lede">치킨, 커피, 배달비… 습관처럼 쓴 돈이 지금까지 모두 얼마인지 계산해 드려요.</p>
+  </header>
+
+  <section class="duel" id="duel" hidden></section>
+
+  <form id="calc" autocomplete="off">
+    <fieldset>
+      <legend>어디에 썼나요? <span class="hint">여러 개 골라도 돼요</span></legend>
+      <div class="chips" id="habits"></div>
+    </fieldset>
+    <div class="items" id="items"></div>
+    <fieldset>
+      <legend>언제부터?</legend>
+      <div class="seg" id="years"></div>
+    </fieldset>
+    <button type="submit" class="print" id="printBtn">영수증 뽑기</button>
+  </form>
+
+  <div class="slot" id="slot" hidden>
+    <section class="receipt" id="receipt" aria-live="polite"></section>
+    <button type="button" class="next-cta" id="nextCta" hidden></button>
+  </div>
+
+  <div class="vs" id="vs" hidden></div>
+
+  <section class="game" id="game" aria-live="polite"></section>
+
+  <section class="share" id="share" hidden>
+    <h2>자랑하기</h2>
+    <div class="field">
+      <label for="nick">내 이름(닉네임) <span class="hint">도전장과 이미지에 들어가요</span></label>
+      <input type="text" id="nick" maxlength="10" placeholder="예: 수진">
+    </div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="saveBtn">결과 이미지</button>
+      <button type="button" class="btn" id="duelBtn">도전장 링크</button>
+      <button type="button" class="btn" id="copyBtn">문구 복사</button>
+    </div>
+    <p class="toast" id="toast" role="status"></p>
+    <div class="share-out" id="shareOut" hidden>
+      <figure>
+        <img class="story" id="storyImg" alt="결과 이미지">
+        <figcaption>이미지를 길게 눌러 저장하세요 · PC는 우클릭 → 이미지 저장</figcaption>
+      </figure>
+      <div class="kakao" aria-label="카톡 공유 미리보기">
+        <div class="kbubble">
+          <img id="ogImg" alt="카톡 미리보기 이미지">
+          <div class="kt" id="ogTitle"></div>
+          <div class="kd" id="ogDesc"></div>
+          <div class="kb">나도 영수증 뽑기</div>
+        </div>
+      </div>
+      <div class="kcap">카톡으로 보내면 이렇게 보여요(배포 버전 예시)</div>
+    </div>
+  </section>
+
+  <div class="dock" id="dock" hidden>
+    <button type="button" class="dock-btn" id="dockBtn">📈 이 돈으로 주식을 했다면? →</button>
+  </div>
+
+  <section class="notes">
+    <p>· 환산은 대략이에요. 치킨 박스 높이 10cm, 아메리카노 355mL, 배달 대기 30분, 담배 1개비 8.4cm, 편의점 1회 5분, 택시 1회 7km 로 계산했어요.</p>
+    <p>· 주식시장 평균은 미국 S&amp;P500 지수(배당 제외)를 원·달러 월말 환율로 원화 환산해 계산했어요. 매달 말 영수증 금액만큼 샀고, 판 뒤의 돈은 이자 없는 현금으로 뒀어요. 2015년 1월 ~ 2026년 9월, 출처 Yahoo Finance. 세금·수수료는 빼지 않았어요.</p>
+    <p>· 사건 카드는 그 달에 실제로 있었던 일이고, 잔고는 그 달 말 기준이에요.</p>
+    <p>· 과거 결과는 미래를 보장하지 않아요. 특정 상품이나 투자를 권하는 계산이 아니에요.</p>
+    <p class="proto">프로토타입: 결과 이미지와 도전장 링크는 지금도 동작해요. 카톡 공유 창과 앱 설치 스토어 연결은 배포할 때 붙여요.</p>
+  </section>
+</div>
+
+<script>
+const DATA = {"start":"2015-01","end":"2026-09","spx":[1994.99,2104.5,2067.89,2085.51,2107.39,2063.11,2103.84,1972.18,1920.03,2079.36,2080.41,2043.94,1940.24,1932.23,2059.74,2065.3,2096.95,2098.86,2173.6,2170.95,2168.27,2126.15,2198.81,2238.83,2278.87,2363.64,2362.72,2384.2,2411.8,2423.41,2470.3,2471.65,2519.36,2575.26,2647.58,2673.61,2823.81,2713.83,2640.87,2648.05,2705.27,2718.37,2816.29,2901.52,2913.98,2711.74,2760.17,2506.85,2704.1,2784.49,2834.4,2945.83,2752.06,2941.76,2980.38,2926.46,2976.74,3037.56,3140.98,3230.78,3225.52,2954.22,2584.59,2912.43,3044.31,3100.29,3271.12,3500.31,3363.0,3269.96,3621.63,3756.07,3714.24,3811.15,3972.89,4181.17,4204.11,4297.5,4395.26,4522.68,4307.54,4605.38,4567.0,4766.18,4515.55,4373.94,4530.41,4131.93,4132.15,3785.38,4130.29,3955.0,3585.62,3871.98,4080.11,3839.5,4076.6,3970.15,4109.31,4169.48,4179.83,4450.38,4588.96,4507.66,4288.05,4193.8,4567.8,4769.83,4845.65,5096.27,5254.35,5035.69,5277.51,5460.48,5522.3,5648.4,5762.48,5705.45,6032.38,5881.63,6040.53,5954.5,5611.85,5569.06,5911.69,6204.95,6339.39,6460.26,6688.46,6840.2,6849.09,6845.5,6939.03,6878.88,6528.52,7209.01,7580.06,7499.36,7489.72,7686.14,7651.54],"krw":[1101.0,1100.67,1105.5,1068.97,1107.0,1118.22,1170.77,1177.6,1194.16,1139.86,1154.83,1175.44,1205.63,1241.13,1140.23,1143.0,1198.45,1152.15,1123.35,1118.38,1101.62,1146.7,1167.86,1206.26,1169.21,1133.94,1117.02,1135.64,1123.9,1146.14,1124.05,1123.33,1145.94,1123.45,1080.66,1066.38,1072.54,1079.39,1059.9,1067.6,1075.03,1120.54,1116.67,1115.45,1109.16,1137.7,1117.02,1116.3,1109.0,1115.1,1135.9,1158.79,1188.38,1155.51,1180.65,1207.16,1201.91,1163.7,1181.57,1156.35,1187.12,1200.1,1222.7,1210.79,1230.27,1198.49,1189.56,1179.59,1167.86,1129.52,1104.33,1086.42,1117.43,1123.37,1132.32,1106.63,1112.85,1130.51,1150.63,1165.51,1187.43,1174.38,1190.74,1189.89,1207.71,1197.59,1210.44,1263.38,1236.17,1301.73,1302.87,1350.19,1430.17,1421.65,1325.37,1260.91,1231.5,1318.35,1296.5,1337.32,1319.79,1323.07,1272.39,1323.03,1351.93,1348.07,1288.36,1293.53,1326.62,1333.38,1345.29,1374.64,1375.62,1380.28,1383.5,1336.57,1309.3,1378.57,1399.86,1467.39,1441.66,1449.86,1469.41,1431.16,1381.98,1363.59,1392.52,1386.97,1399.33,1424.02,1466.13,1437.91,1449.7,1432.32,1516.13,1487.38,1505.96,1541.73,1420.6,1377.11,1350.5]};
+
+const FREQS = [
+  { id: "m1", label: "월 1회",    perWeek: 12 / 52 },
+  { id: "m2", label: "월 2회",    perWeek: 24 / 52 },
+  { id: "w1", label: "주 1회",    perWeek: 1 },
+  { id: "w2", label: "주 2회",    perWeek: 2 },
+  { id: "w3", label: "주 3회",    perWeek: 3 },
+  { id: "w5", label: "주 5회",    perWeek: 5 },
+  { id: "d1", label: "매일",      perWeek: 7 },
+  { id: "d2", label: "하루 2번",  perWeek: 14 },
+];
+
+// 칭호는 금액 구간(100만·500만·1,500만 원)마다 한 단계씩 매워진다.
+const HABITS = [
+  { id: "chicken", icon: "🍗", name: "치킨", unit: "마리", price: 20000, freq: "w1", adj: "야식형",
+    titles: ["닭 한 마리의 원수", "양계장 VIP 고객", "닭들 사이 현상수배범", "치킨 프랜차이즈 실질 대주주"],
+    roast: (n) => `닭 ${fmt(n)}마리가 당신 이름을 압니다.`,
+    fact: (n) => { const m = n * 0.1; return ["📦", `치킨 박스를 쌓으면 ${fmt(m)}m, 아파트 ${fmt(m / 2.8)}층 높이`]; } },
+  { id: "coffee", icon: "☕", name: "아메리카노", unit: "잔", price: 4500, freq: "w5", adj: "카페인형",
+    titles: ["카페인 새싹", "혈관에 에스프레소 흐르는 사람", "동네 카페 월세 담당", "원두 농장 비공식 물주"],
+    roast: () => `피검사하면 아메리카노가 나올 거예요.`,
+    fact: (n) => { const l = n * 0.355; return ["🛁", l >= 200 ? `마신 커피로 욕조 ${fmt(l / 200)}개를 채워요` : `마신 커피가 ${fmt(l)}L, 욕조 하나를 거의 채워요`]; } },
+  { id: "delivery", icon: "🛵", name: "배달비", unit: "번", price: 3500, freq: "w3", adj: "집콕형",
+    titles: ["배달비 기부 천사", "라이더님들의 VIP", "배달앱이 생일 챙겨 주는 사람", "배달앱 명예 회장님"],
+    roast: () => `현관문이 가족보다 라이더님을 더 자주 봤어요.`,
+    fact: (n) => ["⏳", `배달 기다린 시간만 ${fmt(n * 0.5 / 24)}일`] },
+  { id: "smoke", icon: "🚬", name: "담배", unit: "갑", price: 4500, freq: "d1", adj: "연기형",
+    titles: ["폐가 월세 내는 중", "돈을 태우는 장인", "국가 세수 숨은 공신", "기획재정부 감사패 후보"],
+    roast: () => `폐가 이번 달 월세를 독촉하고 있어요.`,
+    fact: (n) => { const m = n * 20 * 0.084; return ["🗼", `피운 담배를 이으면 ${fmt(m)}m, 에펠탑 ${(m / 330).toFixed(1)}개`]; } },
+  { id: "snack", icon: "🏪", name: "편의점 간식", unit: "번", price: 3000, freq: "w3", adj: "즉흥형",
+    titles: ["편의점 단골", "알바생이 얼굴 외운 사람", "편의점 본사 숨은 주주", "편의점 하나 차릴 뻔한 사람"],
+    roast: () => `알바생이 발소리만 듣고 계산대에 섭니다.`,
+    fact: (n) => ["🕒", `편의점에 머문 시간만 ${fmt(n * 5 / 60)}시간`] },
+  { id: "taxi", icon: "🚕", name: "택시", unit: "번", price: 13000, freq: "w2", adj: "귀차니즘형",
+    titles: ["기본요금 마스터", "기사님 단골 손님", "걸어 다니는 법인카드", "다리는 장식인 사람"],
+    roast: () => `다리는 장식인가요?`,
+    fact: (n) => { const km = n * 7; return ["🛣️", `택시로 ${fmt(km)}km, 서울↔부산 ${(km / 800).toFixed(1)}번 왕복`]; } },
+  { id: "custom", icon: "✏️", name: "직접 입력", unit: "번", price: 13500, freq: "m1", adj: "취향형",
+    titles: ["소소한 낭비러", "티끌 모아 탕진러", "꾸준한 탕진의 아이콘", "탕진의 전설"],
+    roast: () => `통장이 조용히 울고 있어요.`,
+    fact: (n, spent) => ["🍗", `이 돈이면 치킨 ${fmt(spent / 20000)}마리`] },
+];
+const YEARS = [2015, 2018, 2020, 2022];
+const TIERS = [1e6, 5e6, 1.5e7];
+const WEEKS_PER_MONTH = 52 / 12;
+
+// 사건 카드: i = 2015년 1월부터 센 달 번호. 그 달에 실제로 있었던 일만 쓴다.
+const EVENTS = {
+  7:   { head: "중국 위안화 절하 충격",          sub: "세계 증시가 한꺼번에 흔들렸어요." },
+  47:  { head: "미중 무역전쟁 · 금리 인상 공포",  sub: "한 달 만에 크게 빠졌어요." },
+  62:  { head: "코로나19 팬데믹",                sub: "전 세계가 멈추고 주식시장이 폭락했어요." },
+  70:  { head: "백신 개발 성공 소식",            sub: "주식시장이 급등했어요. 오른 김에 챙길까요?" },
+  83:  { head: "주식시장 사상 최고치",           sub: "주변이 온통 주식 얘기예요. 지금이 꼭대기일까요?" },
+  89:  { head: "물가 40년 만에 최고 · 금리 급등", sub: "하락장이 길어지고 있어요. 언제 끝날지 아무도 몰라요." },
+  105: { head: "미국 국채금리 16년 만에 5% 돌파", sub: "주식시장이 또 미끄러졌어요." },
+  123: { head: "미국 관세 발표 충격",            sub: "이틀 만에 10% 넘게 빠졌다가 크게 출렁였어요." },
+};
+const ROUNDS = { 2015: [7, 62, 83, 89], 2018: [47, 62, 83, 89], 2020: [62, 70, 89, 123], 2022: [89, 105, 123] };
+// 단톡방 유혹: [주식을 들고 있을 때, 이미 팔고 현금일 때]
+// 말하는 사람은 게임마다 정한다 — 도전장으로 들어왔으면 그 친구가 먼저 말하고, 나머지는 가상 이름에서 무작위로 뽑는다.
+const CHAT = {
+  7:   ["중국 때문에 다 빠진대… 나 정리함", "벌써 팔았어? 다들 다시 줍던데"],
+  47:  ["무역전쟁 끝이 안 보여. 나 전량 매도했다", "현금 들고 있으니까 마음은 편하지?"],
+  62:  ["나 다 팔았다 ㅋㅋ 너도 빨리 팔아", "지금이 바닥일 수도? 난 다시 들어감"],
+  70:  ["백신 떴다! 지금 익절각 아님?", "아직도 현금이야? 다 올랐는데 ㅋㅋ"],
+  83:  ["꼭대기 냄새 난다. 난 오늘 다 판다", "다들 사상 최고래. 지금이라도 탈래?"],
+  89:  ["이번엔 진짜 끝이래. 현금이 왕이야", "많이 빠졌네. 싸게 줍는 거 어때?"],
+  105: ["금리 5%면 예금이 낫지. 난 갈아탐", "현금 들고 있으니까 잠은 잘 오지?"],
+  123: ["관세 폭탄 터짐. 난 일단 탈출", "폭락은 기회라던데… 들어가?"],
+};
+const CHAT_NAMES = ["민수", "지영", "준호", "서연", "현우", "하은", "도윤", "지민"];
+function pickChatNames() {
+  const pool = [...CHAT_NAMES].sort(() => Math.random() - 0.5);
+  return friend ? [friend.n, pool[0]] : [pool[0], pool[1]];
+}
+
+const $ = (id) => document.getElementById(id);
+const state = {
+  year: 2020,
+  picked: ["chicken", "coffee"],
+  inputs: Object.fromEntries(HABITS.map((h) => [h.id, { price: h.price, freq: h.freq }])),
+  customName: "OTT 구독",
+};
+let game = null; // { res, k, acts: {i: "sell"|"buy"}, log: [], done }
+
+const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+function won(n) {
+  n = Math.round(n);
+  if (n >= 1e8) {
+    const eok = Math.floor(n / 1e8), man = Math.round((n % 1e8) / 1e4);
+    return man ? `${fmt(eok)}억 ${fmt(man)}만 원` : `${fmt(eok)}억 원`;
+  }
+  if (n >= 1e4) return `${fmt(n / 1e4)}만 원`;
+  return `${fmt(n)}원`;
+}
+function josa(word, withFinal, withoutFinal) {
+  const c = word.charCodeAt(word.length - 1);
+  if (c < 0xac00 || c > 0xd7a3) return withoutFinal;
+  return (c - 0xac00) % 28 ? withFinal : withoutFinal;
+}
+const esc = (s) => s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+const when = (i) => `${2015 + Math.floor(i / 12)}년 ${i % 12 + 1}월`;
+const habit = (id) => HABITS.find((h) => h.id === id);
+const nameOf = (h) => (h.id === "custom" ? state.customName.trim() || "내 소비" : h.name);
+const LAST = DATA.spx.length - 1;
+
+// 매달 말 영수증 금액을 넣는다. 주식을 들고 있으면 원화→달러로 S&P500 을 사고, 팔고 나면 현금(이자 없음)으로 쌓인다.
+// upto 달의 납입까지 반영한 잔고를 돌려준다. acts 는 upto 보다 앞선 달의 결정만 적용된다.
+function run(monthly, startYear, upto, acts) {
+  let units = 0, cash = 0, spent = 0, inMarket = true;
+  for (let i = (startYear - 2015) * 12; i <= upto; i++) {
+    if (inMarket) units += monthly / DATA.krw[i] / DATA.spx[i]; else cash += monthly;
+    spent += monthly;
+    if (i === upto) break;
+    const a = acts[i];
+    if (a === "sell" && inMarket) { cash += units * DATA.spx[i] * DATA.krw[i]; units = 0; inMarket = false; }
+    if (a === "buy" && !inMarket) { units += cash / DATA.krw[i] / DATA.spx[i]; cash = 0; inMarket = true; }
+  }
+  const stock = units * DATA.spx[upto] * DATA.krw[upto];
+  return { spent, stock, cash, total: stock + cash, inMarket };
+}
+
+function compute() {
+  const months = (2026 - state.year) * 12 + 9;
+  const rows = state.picked.map((id) => {
+    const h = habit(id), inp = state.inputs[id];
+    const perWeek = FREQS.find((f) => f.id === inp.freq).perWeek;
+    const count = perWeek * WEEKS_PER_MONTH * months;
+    return { h, name: nameOf(h), count, spent: count * inp.price, monthly: inp.price * perWeek * WEEKS_PER_MONTH };
+  }).sort((a, b) => b.spent - a.spent);
+  const total = rows.reduce((s, r) => s + r.spent, 0);
+  const monthly = rows.reduce((s, r) => s + r.monthly, 0);
+  return { year: state.year, months, rows, total, monthly };
+}
+
+function titleFor(res) {
+  if (!res.rows.length || res.total === 0) return "아직 결백한 사람";
+  const tier = TIERS.filter((t) => res.total >= t).length;
+  const main = res.rows[0].h.titles[tier];
+  return res.rows.length > 1 ? `${res.rows[1].h.adj} ${main}` : main;
+}
+
+let receiptTitle = "", receiptLine = "", gameLine = "";
+function renderReceipt(animate) {
+  const res = compute();
+  const el = $("receipt");
+  if (!res.rows.length) {
+    el.classList.remove("printing");
+    el.innerHTML = `<div class="r-head"><strong>RECEIPT</strong><span>아직 고른 소비가 없어요</span></div><hr class="dash"><p class="roast">위에서 하나라도 골라 주세요. 결백한 사람은 영수증이 안 나와요.</p>`;
+    game = null; renderGame();
+    $("nextCta").hidden = true; updateDock();
+    return;
+  }
+  const title = titleFor(res);
+  const top = res.rows[0];
+  let d = 0;
+  const line = (html) => `<div class="pl" style="--d:${d++}">${html}</div>`;
+  const items = res.rows.map((r) => line(`<div class="r-line"><span>${esc(r.name)} × ${fmt(r.count)}${esc(r.h.unit)}</span><span>${fmt(r.spent)}</span></div>`)).join("");
+  const facts = res.rows.slice(0, 3).map((r) => { const [ic, t] = r.h.fact(r.count, r.spent); return `<li><span aria-hidden="true">${ic}</span><span>${t}</span></li>`; }).join("");
+  const head = line(`<div class="r-head"><strong>RECEIPT</strong><span>${res.year}.01 ~ 2026.09 · ${res.months}개월</span></div>`);
+  const totalLine = line(`<div class="r-total"><span>TOTAL</span><b id="totalNum">${won(res.total)}</b></div><p class="r-pace">한 달 ${won(res.monthly)} · 1년 ${won(res.monthly * 12)}</p>`);
+  const roastLine = line(`<p class="roast">${esc(top.h.roast(top.count))}</p>`);
+  const factLine = line(`<ul class="facts">${facts}</ul>`);
+  const stampDelay = d * 150 + 900;
+
+  el.innerHTML = `
+    ${head}
+    <hr class="dash">
+    ${items}
+    <hr class="dash">
+    ${totalLine}
+    <hr class="dash">
+    ${roastLine}
+    ${factLine}
+    <div class="stamp-wrap"><div class="stamp" style="--sd:${stampDelay}ms"><small>공식 인증 칭호</small><strong>${esc(title)}</strong></div></div>
+    <hr class="dash">
+    <div class="r-foot"><div class="barcode" aria-hidden="true"></div><span>이 영수증은 환불되지 않습니다</span></div>`;
+
+  el.classList.remove("printing");
+  if (animate && !reduceMotion()) {
+    void el.offsetWidth; // restart animation
+    el.classList.add("printing");
+    countUp($("totalNum"), res.total, 250 + 150 * (res.rows.length + 1), 700);
+  }
+
+  receiptTitle = title;
+  receiptLine = `${res.year}년부터 ${res.rows.map((r) => `${r.name} ${fmt(r.count)}${r.h.unit}`).join("·")}, 다 합쳐 ${won(res.total)}`;
+  gameLine = "";
+  lastRes = res; lastGame = null;
+  $("shareOut").hidden = true;
+  game = { res, k: -1, acts: {}, log: [], done: false, names: pickChatNames() };
+  if (animate) printed = true;
+  renderVs(res);
+  renderGame();
+
+  // 영수증 바로 밑에 붙는 다음 단계 버튼. 도장이 찍힌 뒤에 나타난다.
+  const cta = $("nextCta");
+  cta.innerHTML = `<span>📈 이 ${won(res.total)}으로 주식을 했다면?</span><small>실제 사건 ${ROUNDS[res.year].length}개 · 1분이면 끝나요 →</small>`;
+  cta.style.setProperty("--cd", `${stampDelay + 500}ms`);
+  cta.classList.toggle("appear", !!animate && !reduceMotion());
+  cta.hidden = false;
+  updateDock();
+}
+
+// ── 친구 도전장 ─────────────────────────────────────────────
+// 결과를 링크 뒤 #토큰에 담는다. 이 페이지에서는 「#글자·숫자·-·_」만 전달되므로 base64url 로 감싼다.
+// 배포 때는 SHARE_BASE 를 실제 사이트 주소로 바꾸고, 같은 토큰으로 서버가 결과별 OG 이미지를 만든다.
+const SHARE_BASE = "https://sujin412.github.io/chicken-receipt/";
+let lastRes = null, lastGame = null, friend = null, printed = false; // printed: 예시가 아니라 내가 뽑은 영수증인지
+
+function b64urlEncode(obj) {
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  let bin = ""; bytes.forEach((b) => { bin += String.fromCharCode(b); });
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64urlDecode(s) {
+  const bin = atob(s.replace(/-/g, "+").replace(/_/g, "/"));
+  return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
+}
+function readFriend() {
+  try {
+    const h = location.hash.slice(1);
+    if (!h.startsWith("d")) return null;
+    const f = b64urlDecode(h.slice(1));
+    return f && typeof f.tot === "number" && typeof f.t === "string" ? f : null;
+  } catch (_) { return null; }
+}
+const nick = () => $("nick").value.trim() || "친구";
+function duelToken() {
+  const f = { n: nick(), t: receiptTitle, tot: Math.round(lastRes.total), y: lastRes.year, f: lastRes.rows[0].name };
+  if (lastGame) { f.g = lastGame.type; f.gm = Math.round(lastGame.total); }
+  return "d" + b64urlEncode(f);
+}
+
+function renderDuel() {
+  const el = $("duel");
+  if (!friend) { el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = `
+    <div class="tag">CHALLENGE · 도전장 도착</div>
+    <p class="big">${esc(friend.n)}님은 「${esc(friend.t)}」</p>
+    <p class="meta">${friend.y}년부터 ${won(friend.tot)} 썼고${friend.g ? `, 투자 성향은 「${esc(friend.g)}」` : ""}. 당신은 이길 수 있어요?</p>`;
+}
+function renderVs(res) {
+  const el = $("vs");
+  if (!friend || !printed) { el.hidden = true; return; }
+  el.hidden = false;
+  const diff = res.total - friend.tot;
+  const verdict = Math.abs(diff) < 10000 ? "둘이 거의 똑같이 썼어요. 소비 쌍둥이 인정."
+    : diff > 0 ? `${esc(friend.n)}님보다 ${won(diff)} 더 썼어요. 이번 판은 당신이 더 매워요.`
+    : `${esc(friend.n)}님보다 ${won(-diff)} 덜 썼어요. 절약왕은 당신.`;
+  el.innerHTML = `<span>VS ${esc(friend.n)}</span><b>${verdict}</b>`;
+}
+
+const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function countUp(node, target, delay, dur) {
+  const t0 = performance.now() + delay;
+  node.textContent = won(0);
+  const tick = (t) => {
+    const k = Math.min(1, Math.max(0, (t - t0) / dur));
+    node.textContent = won(target * (1 - Math.pow(1 - k, 3)));
+    if (k < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function renderGame() {
+  const g = $("game");
+  if (!game) { g.hidden = true; g.innerHTML = ""; return; }
+  g.hidden = false;
+  const res = game.res;
+  const rounds = ROUNDS[res.year];
+  const food = res.rows[0].name;
+
+  // 시작 전에는 게임 칸을 숨기고, 영수증 바로 아래 「이 돈으로 주식을 했다면?」 버튼이 시작을 맡는다.
+  if (game.k < 0) { g.hidden = true; g.innerHTML = ""; return; }
+  $("nextCta").hidden = true;
+  updateDock();
+
+  if (!game.done) {
+    const i = rounds[game.k];
+    const ev = EVENTS[i];
+    const s = run(res.monthly, res.year, i, game.acts);
+    const gain = s.total - s.spent;
+    const pct = (s.total / s.spent - 1) * 100;
+    const dir = gain >= 0 ? "up" : "down";
+    const sign = gain >= 0 ? "▲ +" : "▼ ";
+    const acct = s.inMarket
+      ? `<div class="acct-row"><span>평가금액</span><b>${fmt(s.total)}원</b></div>
+         <div class="acct-row"><span>평가손익</span><span class="plv ${dir}">${sign}${fmt(Math.abs(gain))} (${gain >= 0 ? "+" : ""}${pct.toFixed(1)}%)</span></div>
+         <div class="acct-sep"></div>
+         <div class="acct-row sm"><span>보유</span><span>주식시장 평균 · 투자원금 ${fmt(s.spent)}원</span></div>`
+      : `<div class="acct-row"><span>예수금(현금)</span><b>${fmt(s.total)}원</b></div>
+         <div class="acct-row"><span>평가손익</span><span class="plv">보유 종목 없음</span></div>
+         <div class="acct-sep"></div>
+         <div class="acct-row sm"><span>보유</span><span>없음 · 투자원금 ${fmt(s.spent)}원</span></div>`;
+    const choices = s.inMarket
+      ? `<button type="button" class="choice" data-a="hold">보유 유지<small>계속 들고 간다</small></button>
+         <button type="button" class="choice sell" data-a="sell">전량 매도<small>현금으로 바꾼다</small></button>`
+      : `<button type="button" class="choice buy" data-a="buy">전량 매수<small>현금을 다 넣는다</small></button>
+         <button type="button" class="choice" data-a="wait">현금 유지<small>아직은 무섭다</small></button>`;
+    const chat = [game.names[game.k % 2], CHAT[i][s.inMarket ? 0 : 1]];
+    g.innerHTML = `
+      <h2>이 돈으로 주식을 했다면?</h2>
+      <p class="intro">매달 ${won(res.monthly)}씩 주식시장 평균에 넣었다고 쳐요. 실제로 있었던 사건마다 보유할지 팔지 골라 주세요.</p>
+      <div class="progress" aria-label="사건 ${game.k + 1} / ${rounds.length}">${rounds.map((_, n) => `<i class="${n <= game.k ? "on" : ""}"></i>`).join("")}</div>
+      <div class="ev ${reduceMotion() ? "" : "enter"}">
+        <div class="news"><span class="flash">속보</span><span class="when">${when(i)} · 사건 ${game.k + 1}/${rounds.length}</span></div>
+        <p class="head">${ev.head}</p>
+        <p class="sub">${ev.sub}</p>
+        <div class="acct">
+          <div class="acct-top"><span>내 계좌 · ${esc(food)}값 투자</span><span>${when(i)} 말</span></div>
+          ${acct}
+          <div class="fill" id="fill" hidden></div>
+        </div>
+        <div class="chat"><span class="who">단톡방 · ${esc(chat[0])}</span><p>${chat[1]}</p></div>
+        <div class="choices">${choices}</div>
+      </div>
+      ${game.log.length ? `<ul class="log">${game.log.map((l) => `<li>${l}</li>`).join("")}</ul>` : ""}`;
+    g.querySelectorAll(".choice").forEach((b) => b.addEventListener("click", () => {
+      const a = b.dataset.a;
+      if (a === "sell" || a === "buy") game.acts[i] = a;
+      const label = { hold: "보유 유지", sell: "전량 매도", buy: "전량 매수", wait: "현금 유지" }[a];
+      game.log.push(`${when(i)} · ${ev.head} → ${label}`);
+      g.querySelectorAll(".choice").forEach((x) => { x.disabled = true; });
+      const fill = $("fill");
+      fill.className = `fill ${a}`;
+      fill.textContent = {
+        sell: `✔ 전량 매도 체결 · ${fmt(s.total)}원이 현금으로 들어왔어요`,
+        buy: `✔ 전량 매수 체결 · ${fmt(s.total)}원어치 샀어요`,
+        hold: "보유 유지 · 다음 사건까지 그대로 들고 가요",
+        wait: "현금 유지 · 다음 사건까지 지켜봐요",
+      }[a];
+      fill.hidden = false;
+      setTimeout(() => {
+        game.k++;
+        if (game.k >= rounds.length) game.done = true;
+        renderGame();
+      }, reduceMotion() ? 400 : 1100);
+    }));
+    return;
+  }
+
+  // 결과 판정
+  const mine = run(res.monthly, res.year, LAST, game.acts);
+  const hold = run(res.monthly, res.year, LAST, {});
+  const sold = Object.values(game.acts).includes("sell");
+  let type, punch;
+  if (mine.total < mine.spent) {
+    type = sold ? "공포의 손절러" : "운 없는 개미";
+    punch = `어차피 잃었겠네요. ${esc(food)}${josa(food, "으로", "로")} 배라도 불렀으니 다행이에요 🍗`;
+  } else if (mine.total >= hold.total * 0.97 && !sold) {
+    type = "강철 멘탈";
+    punch = `${esc(food)}값이 ${won(mine.total)}${josa(won(mine.total), "이", "가")} 됐겠네요. 배 아프죠?`;
+  } else if (mine.total >= hold.total * 0.97) {
+    type = "롤러코스터 개미";
+    punch = `팔았다 다시 샀는데 결과는 그냥 버틴 거랑 비슷해요. 심장만 고생했네요.`;
+  } else {
+    type = "팔랑귀";
+    punch = `벌긴 벌었는데, 버텼으면 ${won(hold.total - mine.total)} 더 있었어요. 팔랑귀 인증.`;
+  }
+  gameLine = `${res.rows[0].name}값으로 주식 했다면: 「${type}」 ${won(mine.total)}`;
+  lastGame = { type, total: mine.total };
+  $("shareOut").hidden = true;
+  $("share").hidden = false;
+  const friendRow = friend && friend.g
+    ? `<div class="r-line"><span>VS ${esc(friend.n)}님은 「${esc(friend.g)}」</span><span>${won(friend.gm)}</span></div>` : "";
+
+  // 수익률 막대: 먹은 돈은 -100%. 0 을 기준으로 왼쪽은 손실(파랑), 오른쪽은 수익(빨강).
+  const mPct = (mine.total / mine.spent - 1) * 100, hPct = (hold.total / hold.spent - 1) * 100;
+  const posMax = Math.max(10, mPct, hPct);
+  const zero = (100 / (100 + posMax)) * 100;
+  const bar = (label, sub, v, me) => {
+    const w = (Math.abs(v) / (100 + posMax)) * 100;
+    const pos = v >= 0;
+    return `<div class="bar-row ${me ? "me" : ""}">
+      <div class="bar-label"><span>${label}</span><span class="bar-v ${pos ? "up" : "down"}">${pos ? "+" : ""}${v.toFixed(1)}%</span></div>
+      <div class="track"><i class="zero" style="left:${zero}%"></i><i class="bar ${pos ? "up" : "down"}" style="${pos ? `left:${zero}%` : `right:${100 - zero}%`};--w:${w}%"></i></div>
+      <div class="bar-sub">${sub}</div>
+    </div>`;
+  };
+  const unitPrice = res.rows[0].spent / res.rows[0].count;
+  const unit = res.rows[0].h.unit;
+  const more = Math.round((hold.total - mine.total) / unitPrice);
+  const diffLine = more >= 1
+    ? `버텼으면 ${esc(food)} <b>${fmt(more)}${esc(unit)}</b>${josa(unit, "을", "를")} 더 먹을 수 있었어요.`
+    : `먹는 대신 넣었다면 ${esc(food)} <b>${fmt(Math.max(0, mine.total - mine.spent) / unitPrice)}${esc(unit)}</b>${josa(unit, "이", "가")} 공짜로 생긴 셈이에요.`;
+  g.innerHTML = `
+    <div class="verdict">
+      <div class="small">당신의 투자 성향</div>
+      <div class="stamp-wrap"><div class="stamp ${reduceMotion() ? "" : "thunk"}"><small>판정</small><strong>${type}</strong></div></div>
+      <p class="myret ${mPct >= 0 ? "up" : "down"}">내 수익률 ${mPct >= 0 ? "+" : ""}${mPct.toFixed(1)}%</p>
+      <p class="punch">${punch}</p>
+      <div class="bars" id="bars">
+        ${bar(`${res.rows[0].h.icon} 그냥 ${esc(food)}에 씀`, "0원 · 추억만 남음", -100, false)}
+        ${bar(`😎 내 선택 (${type})`, won(mine.total), mPct, true)}
+        ${bar("💪 끝까지 보유", won(hold.total), hPct, false)}
+      </div>
+      <p class="diff">${diffLine}</p>
+      ${friendRow ? `<div class="cmp">${friendRow}</div>` : ""}
+      <ul class="log">${game.log.map((l) => `<li>${l}</li>`).join("")}</ul>
+      <p class="lesson">결과를 가른 건 무엇을 샀느냐가 아니라 <b>떨어질 때 어떻게 했느냐</b>였어요. 앞으로 아낀 돈은, 사기 전에 공부부터.</p>
+      <button type="button" class="go red" id="appBtn">앱에서 주식 공부 시작하기</button>
+      <button type="button" class="btn" id="againBtn">다른 선택으로 다시 해 보기</button>
+      <p class="small">지난 결과일 뿐 앞으로도 그렇다는 보장은 없어요.</p>
+    </div>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => $("bars").classList.add("go")));
+  $("appBtn").addEventListener("click", () => toast("배포 버전에서는 앱 설치 스토어(App Store · Google Play)로 이동해요."));
+  $("againBtn").addEventListener("click", () => { game = { res, k: 0, acts: {}, log: [], done: false, names: pickChatNames() }; gameLine = ""; renderGame(); });
+}
+
+function buildControls() {
+  $("habits").innerHTML = HABITS.map((h) => `
+    <input type="checkbox" name="habit" id="h-${h.id}" value="${h.id}" ${state.picked.includes(h.id) ? "checked" : ""}>
+    <label for="h-${h.id}"><span aria-hidden="true">${h.icon}</span>${h.name}</label>`).join("");
+  $("years").innerHTML = YEARS.map((y) => `
+    <input type="radio" name="year" id="y-${y}" value="${y}" ${y === state.year ? "checked" : ""}>
+    <label for="y-${y}">${y}</label>`).join("");
+  buildItems();
+}
+
+function buildItems() {
+  $("items").innerHTML = HABITS.filter((h) => state.picked.includes(h.id)).map((h) => {
+    const inp = state.inputs[h.id];
+    const nameField = h.id === "custom"
+      ? `<div class="field" style="grid-column:1/-1"><label for="cname">무엇에 썼나요</label><input type="text" id="cname" maxlength="12" value="${esc(state.customName)}"></div>`
+      : `<div class="iname">${h.icon} ${h.name}</div>`;
+    return `<div class="item">
+      ${nameField}
+      <div class="field"><label for="p-${h.id}">한 번에 얼마(원)</label><input type="number" id="p-${h.id}" data-id="${h.id}" min="0" step="500" inputmode="numeric" value="${inp.price}"></div>
+      <div class="field"><label for="f-${h.id}">얼마나 자주</label><select id="f-${h.id}" data-id="${h.id}">${FREQS.map((f) => `<option value="${f.id}" ${f.id === inp.freq ? "selected" : ""}>${f.label}</option>`).join("")}</select></div>
+    </div>`;
+  }).join("");
+}
+
+const markDirty = () => {}; // 입력 화면과 결과 화면이 나뉘어 있어서, 입력이 바뀌어도 따로 알릴 영수증이 없다
+const toast = (msg) => { $("toast").textContent = msg; };
+
+$("habits").addEventListener("change", (e) => {
+  const id = e.target.value;
+  state.picked = e.target.checked ? [...state.picked, id] : state.picked.filter((x) => x !== id);
+  buildItems(); markDirty();
+});
+$("items").addEventListener("input", (e) => {
+  const id = e.target.dataset.id;
+  if (e.target.id === "cname") state.customName = e.target.value;
+  else if (e.target.tagName === "INPUT") state.inputs[id].price = Math.max(0, +e.target.value || 0);
+  else if (e.target.tagName === "SELECT") state.inputs[id].freq = e.target.value;
+  markDirty();
+});
+$("years").addEventListener("change", (e) => { state.year = +e.target.value; markDirty(); });
+$("calc").addEventListener("submit", (e) => {
+  e.preventDefault();
+  $("share").hidden = true; // 자랑하기는 주식 결과가 나온 뒤에 연다
+  toast("");
+  setView("result");
+  renderReceipt(true);
+});
+
+// 화면은 둘이다 — 입력(제목·입력 칸) / 결과(영수증부터 아래). 결과 화면에서는 입력 칸을 숨기고 「다시 뽑기」로 돌아온다.
+function setView(view) {
+  const result = view === "result";
+  $("intro").hidden = result;
+  $("calc").hidden = result;
+  $("topbar").hidden = !result;
+  $("slot").hidden = !result;
+  $("duel").hidden = result || !friend;
+  if (!result) {
+    game = null; renderGame();
+    ["vs", "share", "nextCta"].forEach((id) => { $(id).hidden = true; });
+    updateDock();
+  }
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+$("backBtn").addEventListener("click", () => setView("input"));
+
+const duelUrl = () => `${SHARE_BASE}#${duelToken()}`;
+function shareText(withLink) {
+  return `내 칭호: 「${receiptTitle}」\n${receiptLine}.` + (gameLine ? `\n${gameLine}.` : "") + `\n너는 뭐 나옴?` + (withLink ? `\n${duelUrl()}` : "");
+}
+function copy(text, okMsg) {
+  const fallback = () => toast(`복사가 막혀 있어요. 아래 내용을 직접 복사해 주세요.\n${text}`);
+  try { navigator.clipboard.writeText(text).then(() => toast(okMsg), fallback); } catch (_) { fallback(); }
+}
+$("copyBtn").addEventListener("click", () => copy(shareText(true), "복사했어요. 단톡방에 붙여 넣어 보세요."));
+$("duelBtn").addEventListener("click", () => copy(duelUrl(), `도전장 링크를 복사했어요. 친구가 열면 「${nick()}님의 도전장」이 떠요.`));
+
+// ── 결과 이미지(스토리 1080×1920)와 카톡 미리보기(1200×630) ──────────────
+const IMG = { ground: "#eceef3", paper: "#ffffff", ink: "#1c1d20", muted: "#6d6f75", red: "#d8261f" };
+const F = { display: '"Black Han Sans", "Malgun Gothic", sans-serif', mono: '"Nanum Gothic Coding", Consolas, monospace', body: '"IBM Plex Sans KR", "Malgun Gothic", sans-serif' };
+
+function wrapLines(ctx, text, maxW) {
+  const out = []; let line = "";
+  for (const ch of text) {
+    if (ctx.measureText(line + ch).width > maxW && line) { out.push(line); line = ch.trim() ? ch : ""; }
+    else line += ch;
+  }
+  if (line) out.push(line);
+  return out;
+}
+function drawStamp(ctx, cx, cy, label, title, size) {
+  ctx.save();
+  ctx.translate(cx, cy); ctx.rotate(-6 * Math.PI / 180);
+  ctx.font = `${size}px ${F.display}`;
+  const lines = wrapLines(ctx, title, size * 9);
+  const w = Math.max(...lines.map((l) => ctx.measureText(l).width)) + size * 1.4;
+  const h = lines.length * size * 1.2 + size * 1.5;
+  ctx.strokeStyle = IMG.red; ctx.fillStyle = IMG.red;
+  ctx.lineWidth = size * 0.12; ctx.strokeRect(-w / 2, -h / 2, w, h);
+  ctx.lineWidth = size * 0.04; ctx.strokeRect(-w / 2 + size * 0.22, -h / 2 + size * 0.22, w - size * 0.44, h - size * 0.44);
+  ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  ctx.font = `${size * 0.38}px ${F.mono}`;
+  ctx.fillText(label, 0, -h / 2 + size * 0.95);
+  ctx.font = `${size}px ${F.display}`;
+  lines.forEach((l, k) => ctx.fillText(l, 0, -h / 2 + size * 1.25 + (k + 1) * size * 1.15));
+  ctx.restore();
+}
+function drawStory() {
+  const res = lastRes, W = 1080, H = 1920;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = IMG.ground; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = IMG.ink; ctx.textAlign = "center";
+  ctx.font = `80px ${F.display}`; ctx.fillText("그 치킨, 다 모으면 얼마?", W / 2, 210);
+  ctx.font = `40px ${F.body}`; ctx.fillStyle = IMG.muted; ctx.fillText(`${nick()}님의 소비 영수증`, W / 2, 290);
+
+  // receipt paper with zigzag bottom
+  const x = 110, y = 360, w = W - 220, h = 1180, t = 22;
+  ctx.fillStyle = IMG.paper; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + h);
+  for (let px = x + w; px > x; px -= t * 2) { ctx.lineTo(px - t, y + h - t); ctx.lineTo(px - t * 2, y + h); }
+  ctx.closePath(); ctx.fill();
+
+  ctx.fillStyle = IMG.ink; ctx.font = `bold 44px ${F.mono}`; ctx.fillText("R E C E I P T", W / 2, y + 90);
+  ctx.font = `32px ${F.mono}`; ctx.fillStyle = IMG.muted; ctx.fillText(`${res.year}.01 ~ 2026.09 · ${res.months}개월`, W / 2, y + 140);
+  const dash = (yy) => { ctx.save(); ctx.strokeStyle = IMG.muted; ctx.setLineDash([10, 8]); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 50, yy); ctx.lineTo(x + w - 50, yy); ctx.stroke(); ctx.restore(); };
+  dash(y + 180);
+  let yy = y + 250;
+  ctx.font = `36px ${F.mono}`;
+  res.rows.slice(0, 4).forEach((r) => {
+    ctx.fillStyle = IMG.ink; ctx.textAlign = "left"; ctx.fillText(`${r.name} × ${fmt(r.count)}${r.h.unit}`, x + 60, yy);
+    ctx.textAlign = "right"; ctx.fillText(fmt(r.spent), x + w - 60, yy); yy += 62;
+  });
+  if (res.rows.length > 4) { ctx.textAlign = "left"; ctx.fillStyle = IMG.muted; ctx.fillText(`외 ${res.rows.length - 4}개`, x + 60, yy); yy += 62; }
+  dash(yy - 20); yy += 70;
+  ctx.textAlign = "left"; ctx.fillStyle = IMG.ink; ctx.font = `bold 40px ${F.mono}`; ctx.fillText("TOTAL", x + 60, yy);
+  ctx.textAlign = "right"; ctx.font = `100px ${F.display}`; ctx.fillText(won(res.total), x + w - 60, yy + 6);
+  drawStamp(ctx, W / 2, yy + 260, "공식 인증 칭호", receiptTitle, 64);
+  if (lastGame) {
+    ctx.textAlign = "center"; ctx.fillStyle = IMG.ink; ctx.font = `40px ${F.body}`;
+    ctx.fillText(`${res.rows[0].name}값으로 주식 했다면`, W / 2, y + h - 150);
+    ctx.font = `64px ${F.display}`; ctx.fillStyle = IMG.red; ctx.fillText(`「${lastGame.type}」`, W / 2, y + h - 70);
+  }
+  ctx.textAlign = "center"; ctx.fillStyle = IMG.ink; ctx.font = `88px ${F.display}`; ctx.fillText("너는 뭐 나옴?", W / 2, 1700);
+  ctx.font = `36px ${F.body}`; ctx.fillStyle = IMG.muted; ctx.fillText("내 영수증 뽑으러 가기 ↗ 링크는 프로필에", W / 2, 1770);
+  return c.toDataURL("image/png");
+}
+function drawOg() {
+  const res = lastRes, W = 1200, H = 630;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = IMG.paper; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = IMG.ground; ctx.fillRect(0, 0, W, 120);
+  ctx.fillStyle = IMG.ink; ctx.textAlign = "left"; ctx.font = `52px ${F.display}`; ctx.fillText("그 치킨, 다 모으면 얼마?", 60, 82);
+  drawStamp(ctx, W / 2, 330, `${nick()}님의 칭호`, receiptTitle, 70);
+  ctx.textAlign = "center"; ctx.fillStyle = IMG.muted; ctx.font = `36px ${F.body}`;
+  ctx.fillText(`${res.year}년부터 ${won(res.total)}${lastGame ? ` · 투자 성향 「${lastGame.type}」` : ""}`, W / 2, 570);
+  return c.toDataURL("image/png");
+}
+$("saveBtn").addEventListener("click", async () => {
+  if (!lastRes) return;
+  toast("이미지를 만드는 중이에요…");
+  try {
+    await Promise.all([`96px ${F.display}`, `36px ${F.mono}`, `bold 44px ${F.mono}`, `40px ${F.body}`].map((f) => document.fonts.load(f)));
+  } catch (_) { /* 글꼴을 못 불러와도 기본 글꼴로 그린다 */ }
+  $("storyImg").src = drawStory();
+  $("ogImg").src = drawOg();
+  $("ogTitle").textContent = `${nick()}님의 칭호는 「${receiptTitle}」`;
+  $("ogDesc").textContent = `${lastRes.year}년부터 ${won(lastRes.total)} 썼대요. 너는 뭐 나옴?`;
+  $("shareOut").hidden = false;
+  toast("");
+  $("shareOut").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "nearest" });
+});
+
+friend = readFriend();
+window.addEventListener("hashchange", () => { friend = readFriend(); renderDuel(); if (lastRes) renderVs(lastRes); });
+buildControls();
+renderDuel();
+$("game").hidden = true; // 영수증을 뽑기 전에는 영수증·게임·자랑하기를 보여 주지 않는다
+
+// ── 영수증 → 주식 게임으로 넘어가는 길 ─────────────────────
+// 영수증 밑 버튼이 화면 밖으로 나가 있으면 같은 버튼을 화면 아래에 띄운다(게임을 시작하면 사라짐).
+let ctaVisible = false;
+function updateDock() {
+  const waiting = game && game.k < 0 && !$("nextCta").hidden;
+  $("dock").hidden = !(waiting && !ctaVisible);
+}
+function startGame() {
+  if (!game || game.k >= 0) return;
+  game.k = 0;
+  renderGame();
+  $("game").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+}
+$("nextCta").addEventListener("click", startGame);
+$("dockBtn").addEventListener("click", startGame);
+if ("IntersectionObserver" in window) {
+  new IntersectionObserver((entries) => { ctaVisible = entries[0].isIntersecting; updateDock(); }).observe($("nextCta"));
+}
+</script>
+
+</body>
+</html>
