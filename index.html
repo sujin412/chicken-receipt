@@ -981,12 +981,23 @@ $("items").addEventListener("input", (e) => {
   markDirty();
 });
 $("years").addEventListener("change", (e) => { state.year = +e.target.value; markDirty(); });
-$("calc").addEventListener("submit", (e) => {
-  e.preventDefault();
+function showResult(animate) {
   $("share").hidden = true; // 자랑하기는 주식 결과가 나온 뒤에 연다
   toast("");
   setView("result");
-  renderReceipt(true);
+  renderReceipt(animate);
+}
+// 결과 화면은 방문 기록에 한 칸을 쌓는다 — 휴대폰·브라우저 뒤로가기로 입력 화면에 돌아온다.
+// 주소는 바꾸지 않으므로 도전장 #토큰은 그대로 남는다.
+const atResult = () => !!(history.state && history.state.view === "result");
+$("calc").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!atResult()) { try { history.pushState({ view: "result" }, ""); } catch (_) { /* 기록을 못 쌓아도 화면은 넘어간다 */ } }
+  showResult(true);
+});
+window.addEventListener("popstate", () => {
+  if (atResult()) { if ($("slot").hidden) showResult(false); } // 앞으로 가기: 입력값 그대로 영수증을 다시 보여 준다
+  else if (!$("slot").hidden) setView("input");
 });
 
 // 화면은 둘이다 — 입력(제목·입력 칸) / 결과(영수증부터 아래). 결과 화면에서는 입력 칸을 숨기고 「다시 뽑기」로 돌아온다.
@@ -1004,7 +1015,8 @@ function setView(view) {
   }
   window.scrollTo({ top: 0, behavior: "auto" });
 }
-$("backBtn").addEventListener("click", () => setView("input"));
+// 「다시 뽑기」도 뒤로가기와 같은 길로 — 기록을 쌓았으면 한 칸 되돌리고(popstate 가 화면을 바꾼다), 아니면 바로 바꾼다.
+$("backBtn").addEventListener("click", () => { if (atResult()) history.back(); else setView("input"); });
 
 const duelUrl = () => `${SHARE_BASE}#${duelToken()}`;
 function shareText(withLink) {
@@ -1161,6 +1173,8 @@ $("saveBtn").addEventListener("click", async () => {
   $("shareOut").scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "nearest" });
 });
 
+// 새로고침하면 브라우저가 기록 상태를 되살리지만 화면은 입력부터 시작한다 — 상태를 비워 둘을 맞춘다.
+if (atResult()) { try { history.replaceState(null, ""); } catch (_) {} }
 friend = readFriend();
 window.addEventListener("hashchange", () => { friend = readFriend(); renderDuel(); if (lastRes) renderVs(lastRes); });
 buildControls();
