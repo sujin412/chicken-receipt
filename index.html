@@ -1185,12 +1185,20 @@ function drawStory() {
   ctx.font = `36px ${F.body}`; ctx.fillStyle = IMG.muted; ctx.fillText("내 영수증 뽑으러 가기 ↗ 링크는 프로필에", W / 2, footY + 62);
   return c.toDataURL("image/png");
 }
+// 웹 글꼴은 글자 묶음별로 나뉘어 있고, 화면에 나온 적 없는 글자의 묶음은 아직 받지 않은 상태다.
+// 캔버스는 받지 않은 글자를 기본 글꼴로 그려 버리므로(예: 「나옴」의 「옴」), 한 번 그려 보며 글꼴별로 쓰인 글자를 모으고
+// 그 글자들을 다 받은 뒤에 진짜로 그린다.
+async function loadGlyphs(draw) {
+  const used = new Map();
+  const proto = CanvasRenderingContext2D.prototype, orig = proto.fillText;
+  proto.fillText = function (text, ...rest) { used.set(this.font, (used.get(this.font) || "") + text); return orig.call(this, text, ...rest); };
+  try { draw(); } catch (_) { /* 연습 그리기가 실패해도 진짜 그리기는 한다 */ } finally { proto.fillText = orig; }
+  await Promise.all([...used].map(([font, text]) => document.fonts.load(font, text).catch(() => {}))); // 못 받으면 기본 글꼴로 그린다
+}
 $("saveBtn").addEventListener("click", async () => {
   if (!lastRes) return;
   toast("이미지를 만드는 중이에요…");
-  try {
-    await Promise.all([`96px ${F.display}`, `36px ${F.mono}`, `bold 44px ${F.mono}`, `40px ${F.body}`].map((f) => document.fonts.load(f)));
-  } catch (_) { /* 글꼴을 못 불러와도 기본 글꼴로 그린다 */ }
+  await loadGlyphs(drawStory);
   const story = drawStory();
   $("storyImg").src = story;
   prepareStoryFile(story);
